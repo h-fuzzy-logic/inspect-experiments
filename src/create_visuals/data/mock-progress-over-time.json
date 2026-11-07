@@ -1,0 +1,17 @@
+{
+  "title": "Models fix the easy faults fast, then stall.",
+  "subtitle": "Only the human baseline fixes all 4 faults.",
+  "mock": true,
+  "total_faults": 4,
+  "max_hours": 3.5,
+  "series": [
+    {"name": "Human baseline", "baseline": true, "hours": [0, 0.6, 1.3, 2.1, 3.2], "faults": [0, 1, 2, 3, 4]},
+    {"name": "Model A (strong)", "hours": [0, 0.15, 0.4, 3.5], "faults": [0, 1, 2, 2]},
+    {"name": "Model B (cheap)", "hours": [0, 0.3, 3.5], "faults": [0, 1, 1]}
+  ],
+  "annotation": {
+    "text": "Stalls on the interacting\ntimezone + join faults",
+    "xy": [1.6, 2],
+    "text_xy": [1.25, 0.55]
+  }
+}
