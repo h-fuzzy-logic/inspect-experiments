@@ -85,3 +85,4 @@ venv.bak/
 .DS_Store
 logs/
 notes/
+tmp/
