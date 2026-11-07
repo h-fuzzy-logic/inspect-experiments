@@ -248,7 +248,7 @@ The class diagram and the deployment don't line up exactly:
 
 ## Container lifecycle
 
-1. **Build.** On the first run, Inspect builds the image with `docker compose` from the task's Dockerfile. Later runs reuse the image until the Dockerfile changes.
+1. **Build.** On the first run, Inspect builds the image with `docker compose` from the task's Dockerfile, or pulls its default image if the task has no Docker files. See [How Inspect picks the sandbox image](#how-inspect-picks-the-sandbox-image). Later runs reuse the image until the Dockerfile changes.
 2. **Start.** Inspect starts a fresh container for each sample, so one sample's changes never carry over to the next.
 3. **Run.** The agent's tool calls run in the container until the agent submits or hits a limit.
 4. **Score.** The scorer runs on the host. It can still run commands in the container, such as the test suite, before cleanup.
@@ -272,6 +272,18 @@ The class diagram and the deployment don't line up exactly:
 - **Can:** read and edit any file in the container, run Python and shell commands, and run the tests.
 - **Can't:** call the model API, read files on the host, or reach the network. When Inspect writes the compose file for you, from its default image or the task's Dockerfile, it sets `network_mode: none`. A task that supplies its own compose file controls networking itself, so check that file's setting.
 - **Risk:** the agent can also edit the tests or the expected output. The scorer should check results against a copy the agent can't change, such as one kept on the host.
+
+## How Inspect picks the sandbox image
+
+A task asks for a Docker sandbox with `sandbox="docker"`. Inspect then looks in the task's folder and uses the first of these it finds:
+
+1. **A compose file,** such as `compose.yaml`. Inspect uses it as is, with whatever image, networking, and limits it sets. You must set `network_mode: none` yourself.
+2. **A `Dockerfile`.** Inspect builds the image from it and writes a compose file around it, with `network_mode: none`.
+3. **Neither.** Inspect writes a generic compose file that uses its default image, `aisiuk/inspect-tool-support` (Linux with Python 3.12), also with `network_mode: none`.
+
+To point to a compose file somewhere else, pass its path: `sandbox=("docker", "path/to/compose.yaml")`.
+
+In this repo, `hello_docker` has no Docker files, so it uses the default image. The ETL task will use its own Dockerfile (option 2). The logic is in Inspect's `resolve_compose_file()` in `inspect_ai/util/_sandbox/docker/config.py`.
 
 ## Dockerfile
 

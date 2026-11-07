@@ -101,7 +101,7 @@ Things that trip you up:
 
 A codespace is a cloud VM that runs the repo in a dev container and opens in VS Code. It needs no Terraform, SSH setup, or copying the repo.
 
-- **Setup.** Add a `.devcontainer/devcontainer.json` that installs uv and the `docker-in-docker` feature. Inspect then starts the sandbox container inside the codespace.
+- **Setup.** This repo's `.devcontainer/devcontainer.json` installs uv and the `docker-in-docker` feature. Inspect then starts the sandbox container inside the codespace.
 - **API keys.** Store them as Codespaces secrets. GitHub injects them as environment variables, so no `.env` file is needed.
 - **Watching runs.** Codespaces forwards the `inspect view` port to your browser automatically. Forwarded ports are private by default.
 - **Size and cost.** A 4-core, 16 GB machine fits the ETL task. It costs about $0.36 an hour, or about $1.44 for 4 hours, plus storage. These prices are from memory, so check GitHub's billing docs.
@@ -109,6 +109,23 @@ A codespace is a cloud VM that runs the repo in a dev container and opens in VS 
 - **Idle timeout.** A codespace stops after a period without user input, even if an eval is still running. The default is 30 minutes and the maximum is 4 hours. This is the main obstacle for multi-hour unsupervised runs, so set the maximum and check in on the run.
 - **Security.** The codespace has a GitHub token with access to the repo, and outbound network access is open. The sandbox container doesn't get the token unless you pass it in, and it has no network by default, even though the codespace does.
 - **Compared with EC2.** Codespaces is easier to set up and use. EC2 gives you control over the network and has no idle timeout, so it's better for long unsupervised runs.
+
+### Containers inside a codespace
+
+A codespace runs two images, one inside the other:
+
+```
+Codespace (devcontainers/python image)
+├── Inspect, uv, .venv, logs/
+└── Docker (docker-in-docker)
+    └── Sandbox (aisiuk/inspect-tool-support)
+        └── echo hello from docker
+```
+
+- **The codespace image** (`mcr.microsoft.com/devcontainers/python:1-3.11-bookworm`) is set in `.devcontainer/devcontainer.json`. Inspect, uv, `.venv`, and the logs live here. It plays the role your laptop plays locally.
+- **The sandbox image** (`aisiuk/inspect-tool-support`) is Inspect's default, used by `hello_docker` because its folder has no Docker files. It's where the agent's commands run. A task's own `Dockerfile` replaces it. See [How Inspect picks the sandbox image](eval-architecture.md#how-inspect-picks-the-sandbox-image).
+
+Locally, the outer layer is your laptop instead of the codespace image. The sandbox image is the same in both places.
 
 ### Viewing output and logs in Codespaces
 

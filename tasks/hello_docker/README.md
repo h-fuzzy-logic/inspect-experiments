@@ -73,7 +73,7 @@ dataset=[
 
 ## How it works
 
-- `sandbox="docker"` tells Inspect to start a Docker container for the sample, using Inspect's default image.
+- `sandbox="docker"` tells Inspect to start a Docker container for the sample. This folder has no `Dockerfile` or `compose.yaml`, so Inspect uses its default image, `aisiuk/inspect-tool-support`. To use a different image, add a `Dockerfile` here. See [How Inspect picks the sandbox image](../../docs/eval-architecture.md#how-inspect-picks-the-sandbox-image).
 - A small custom solver, `run_in_sandbox()`, runs the sample's input with `sandbox().exec()` and saves the output as the answer. It replaces the usual model call.
 - After the sample is scored, Inspect removes the container.
 
