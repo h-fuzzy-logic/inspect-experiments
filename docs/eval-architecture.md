@@ -199,7 +199,7 @@ In plain terms, the eval runs in three places:
 
 - **Inspect (host, `.venv`).** Runs the task, the agent loop, the tools, and the scorer. Holds the API key and makes every model call.
 - **Model API (external).** Receives the conversation and replies with text or tool calls. It never touches the container.
-- **Sandbox (Docker container).** Runs the commands the agent's tools send. It has no API key, and no network access once the compose file disables networking.
+- **Sandbox (Docker container).** Runs the commands the agent's tools send. It has no API key and, by default, no network access.
 
 The diagram below shows the same thing as a deployment diagram, using UML deployment notation. It maps the parts of the Agent class, and the framework around it, to the machines and runtimes they run on. `«device»` is a machine, `«execution environment»` is a runtime on that machine, and `«container»` is a Docker container. As in the diagram above, the highlighted boxes are the agent.
 
@@ -270,7 +270,7 @@ The class diagram and the deployment don't line up exactly:
 ## What the agent's commands can and can't do
 
 - **Can:** read and edit any file in the container, run Python and shell commands, and run the tests.
-- **Can't:** call the model API or read files on the host. It also can't reach the network once the compose file disables networking, such as with `network_mode: none`.
+- **Can't:** call the model API, read files on the host, or reach the network. When Inspect writes the compose file for you, from its default image or the task's Dockerfile, it sets `network_mode: none`. A task that supplies its own compose file controls networking itself, so check that file's setting.
 - **Risk:** the agent can also edit the tests or the expected output. The scorer should check results against a copy the agent can't change, such as one kept on the host.
 
 ## Dockerfile
@@ -287,5 +287,5 @@ The ETL task's Dockerfile isn't written yet. It's planned to install:
 Left out on purpose:
 
 - **No API keys or `.env` file.** The agent doesn't need them.
-- **No network tools,** such as `curl`. The compose file should also disable networking, such as with `network_mode: none`. Confirm the setting once the compose file exists.
+- **No network tools,** such as `curl`. The container has no network anyway: Inspect's generated compose file sets `network_mode: none`. If the task later adds its own compose file, keep that setting.
 - **No expected outputs.** These stay on the host so the agent can't read or change them.

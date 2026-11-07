@@ -20,7 +20,7 @@
 - Keep host folders out of the container. Copy in only the ETL code and data the task needs. Mount anything else read-only.
 - Never mount the Docker socket or run the container with `--privileged`.
 - Keep `.env` and API keys on the host. Inspect makes the model calls from the host, so the agent doesn't need them.
-- Cut off the network in the compose file (for example `network_mode: none`). Confirm the option in the Inspect sandboxing docs.
+- The sandbox has no network by default. When Inspect writes the compose file, from its default image or the task's Dockerfile, it sets `network_mode: none`. A task that supplies its own compose file must set this itself.
 - Set memory, CPU, and process limits in the compose file.
 - Set `time_limit` and `message_limit` on the task so a stuck agent stops on its own.
 - Run the container as a non-root user.
@@ -107,7 +107,7 @@ A codespace is a cloud VM that runs the repo in a dev container and opens in VS 
 - **Size and cost.** A 4-core, 16 GB machine fits the ETL task. It costs about $0.36 an hour, or about $1.44 for 4 hours, plus storage. These prices are from memory, so check GitHub's billing docs.
 - **Free tier.** Personal accounts get free usage each month: about 120 core-hours and 15 GB of storage on GitHub Free, and 180 core-hours and 20 GB on GitHub Pro. On a 4-core machine, 120 core-hours is about 30 hours of runtime, enough for several 4-hour runs at no cost. Stop or delete codespaces when you're done, because stored codespaces use up the storage quota.
 - **Idle timeout.** A codespace stops after a period without user input, even if an eval is still running. The default is 30 minutes and the maximum is 4 hours. This is the main obstacle for multi-hour unsupervised runs, so set the maximum and check in on the run.
-- **Security.** The codespace has a GitHub token with access to the repo, and outbound network access is open. The sandbox container doesn't get the token unless you pass it in. Still cut off the sandbox's network in the compose file.
+- **Security.** The codespace has a GitHub token with access to the repo, and outbound network access is open. The sandbox container doesn't get the token unless you pass it in, and it has no network by default, even though the codespace does.
 - **Compared with EC2.** Codespaces is easier to set up and use. EC2 gives you control over the network and has no idle timeout, so it's better for long unsupervised runs.
 
 ### Viewing output and logs in Codespaces

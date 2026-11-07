@@ -115,7 +115,7 @@ Inspect can run on your machine in a Python `.venv`, calls the model through the
 
    Then open [http://localhost:7575](http://localhost:7575) in your browser. The viewer keeps running until you stop it with Ctrl+C. To use a different port, add `--port 8000`. You can also open the `.eval` file in VS Code with the Inspect AI extension.
 
-The `hello` task doesn't use a sandbox, so step 5 tests Inspect but not Docker. Step 2 checks Docker on its own.
+The `hello` task doesn't use a sandbox, so step 5 tests Inspect but not Docker. To test them together, run the [hello_docker task](tasks/hello_docker/README.md).
 
 #### API keys
 
@@ -141,7 +141,7 @@ This currently prints a placeholder message.
 - `tasks/<name>/`: one folder per experiment, holding the task file and its data or notes. Run a task by path:
 
   ```sh
-  uv run inspect eval tasks/hello/hello.py
+  uv run inspect eval tasks/hello/hello.py --model mockllm/model
   ```
 
 - `logs/`: eval output (`.eval` files), created by Inspect runs. Git-ignored.
