@@ -65,7 +65,7 @@ Terraform creates the instance and installs Docker, the Compose plugin, git, tmu
    uv run inspect eval tasks/... --model ...
    ```
 
-5. **Watch it and get the results.** Run `uv run inspect view --log-dir logs` on the instance. On your laptop, run `ssh -L 7575:localhost:7575 ec2-user@<ip>` and open `http://localhost:7575` (7575 is the default port, so check the command's output). Copy logs back with:
+5. **Watch it and get the results.** Run `uv run inspect view --log-dir logs` on the instance. On your laptop, run `ssh -L 7575:localhost:7575 ec2-user@<ip>` and open `http://localhost:7575` (7575 is Inspect's default port). Copy logs back with:
 
    ```sh
    rsync -av ec2-user@<ip>:~/inspect-experiments/logs/ ./logs/
