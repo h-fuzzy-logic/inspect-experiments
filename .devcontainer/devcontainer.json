@@ -1,10 +1,12 @@
 {
   "name": "inspect-experiments",
-  "image": "mcr.microsoft.com/devcontainers/python:1-3.11-bookworm",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
   "features": {
     "ghcr.io/devcontainers/features/docker-in-docker:2": {}
   },
-  "postCreateCommand": "pipx install uv && uv sync",
+  "postCreateCommand": "uv sync",
   "forwardPorts": [7575],
   "portsAttributes": {
     "7575": {

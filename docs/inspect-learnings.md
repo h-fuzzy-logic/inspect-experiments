@@ -122,7 +122,7 @@ Codespace (devcontainers/python image)
         └── echo hello from docker
 ```
 
-- **The codespace image** (`mcr.microsoft.com/devcontainers/python:1-3.11-bookworm`) is set in `.devcontainer/devcontainer.json`. Inspect, uv, `.venv`, and the logs live here. It plays the role your laptop plays locally.
+- **The codespace image** (`mcr.microsoft.com/devcontainers/python:1-3.11-bookworm`, with uv added) is set in `.devcontainer/Dockerfile`. Inspect, uv, `.venv`, and the logs live here. It plays the role your laptop plays locally.
 - **The sandbox image** (`aisiuk/inspect-tool-support`) is Inspect's default, used by `hello_docker` because its folder has no Docker files. It's where the agent's commands run. A task's own `Dockerfile` replaces it. See [How Inspect picks the sandbox image](eval-architecture.md#how-inspect-picks-the-sandbox-image).
 
 Locally, the outer layer is your laptop instead of the codespace image. The sandbox image is the same in both places.
