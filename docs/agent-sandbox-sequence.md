@@ -32,3 +32,49 @@ The model API doesn't remember anything between calls. Inspect keeps the convers
 - **Cost:** each call resends the full history, so calls get larger as a long run goes on. Prompt caching and a `token_limit` help.
 - **Long output:** a large command output, such as a `cat` of a big CSV file, stays in the history and is resent every turn. Keep tool output short.
 - **Logs:** `inspect view` shows each sample's message list, so you can see what the model saw at every turn.
+
+## A full run: fix_syntax
+
+The diagram above shows one turn. This one shows a whole run of the `fix_syntax` task, from building the sandbox to scoring and cleanup. The agent turns in the middle are the loop above.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant I as Inspect (.venv)
+    participant D as Docker
+    participant H as Docker Hub
+    participant S as Sandbox container
+    participant M as Model API (external)
+
+    I->>I: Find Dockerfile in tasks/fix_syntax/
+    I->>I: Write compose file (build from Dockerfile, network_mode: none)
+    I->>D: docker compose build
+    opt First run only
+        D->>H: Pull python:3.12-slim
+        H-->>D: Base image
+    end
+    D->>D: Build image: agent user, /workspace, copy sandbox/report.py
+    Note over D: Later runs reuse the built image
+    I->>D: Start container
+    D->>S: Start (no network)
+
+    loop Agent turns
+        I->>M: Send conversation
+        M-->>I: Tool call: bash(command)
+        I->>S: Run command
+        S-->>I: stdout, stderr, exit code
+    end
+    M-->>I: Tool call: submit()
+
+    I->>S: Scorer runs python3 /workspace/report.py
+    S-->>I: Output and exit code
+    I->>I: Compare with expected output (kept on host): C or I
+    I->>D: Remove container
+    I->>I: Write log to logs/
+```
+
+- **Steps 1–2:** Inspect finds the `Dockerfile` in the task's folder, so it builds an image instead of using its default one. See [How Inspect picks the sandbox image](eval-architecture.md#how-inspect-picks-the-sandbox-image).
+- **Steps 3–6:** Docker pulls the base image only on the first run, then builds the task's image. Only `sandbox/` is copied in, so the reference fix in `solution/` never reaches the container.
+- **The agent loop:** the model calls `bash()` until it submits. The container has no network, so it can only run commands.
+- **Scoring:** the scorer runs the script in the same container, then compares the output with the expected output, which is kept on the host so the agent can't change it.
+- **Cleanup:** Inspect removes the container. The image stays, so the next run starts faster.

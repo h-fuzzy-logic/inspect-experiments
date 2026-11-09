@@ -1,0 +1,5 @@
+# Only sandbox/ is visible to the Docker build. This keeps the reference fix
+# (solution/) and the answer key (fix_syntax.py) out of the image, even if a
+# COPY line is later changed to copy everything.
+*
+!sandbox/

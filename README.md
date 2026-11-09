@@ -79,6 +79,7 @@ Inspect can run on your machine in a Python `.venv`, calls the model through the
 
 - [Evaluation Architecture](docs/eval-architecture.md): what the agent is made of, where each part runs, and how the agent works in its sandbox.
 - [Agent tool calls in the sandbox](docs/agent-sandbox-sequence.md): one turn of the agent loop, step by step.
+- [Safety and cost](docs/safety-and-cost.md): the security precautions this repo follows, and how it keeps costs down.
 - [Inspect learnings](docs/inspect-learnings.md): notes on design choices, security, and running in AWS or Codespaces.
 
 ### If you want to run Inspect locally
@@ -119,13 +120,21 @@ The `hello` task doesn't use a sandbox, so step 5 tests Inspect but not Docker. 
 
 #### API keys
 
-To run against a real model, put its key in a `.env` file at the repo root. This file is git-ignored, so create your own:
+Local runs use only the mock model (`--model mockllm/model`), which needs no key. Real model runs happen only in the cloud, which for now means a GitHub Codespace. No API keys are kept in this repo or on your machine.
+
+To give a codespace a key:
+
+1. On GitHub, go to **Settings → Codespaces → Secrets → New secret**.
+2. Name it for the provider, such as `GOOGLE_API_KEY` for Gemini or `ANTHROPIC_API_KEY` for Claude, and limit its access to this repo.
+3. Restart the codespace. GitHub sets the secret as an environment variable, and Inspect reads it from there.
+
+Then, in the codespace, run a task with a real model:
 
 ```sh
-ANTHROPIC_API_KEY=your-key-here
+uv run inspect eval tasks/fix_syntax/fix_syntax.py --model google/gemini-2.5-flash
 ```
 
-Inspect reads `.env` when you run `inspect eval`. Then run the task with a real model, for example `--model anthropic/claude-sonnet-5-5`.
+Check the provider's current model list for the exact name.
 
 ## Running
 
@@ -138,7 +147,7 @@ This currently prints a placeholder message.
 ## Layout
 
 - `src/inspect_experiments/`: package code shared by tasks, such as scorers, solvers, and dataset helpers
-- `tasks/<name>/`: one folder per experiment, holding the task file and its data or notes. Run a task by path:
+- `tasks/<name>/`: one folder per experiment, holding the task file and its data or notes. See [tasks/README.md](tasks/README.md) for the tasks in order. Run a task by path:
 
   ```sh
   uv run inspect eval tasks/hello/hello.py --model mockllm/model
