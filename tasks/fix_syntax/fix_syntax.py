@@ -1,3 +1,4 @@
+import difflib
 from pathlib import Path
 from typing import Literal
 
@@ -24,6 +25,26 @@ carol: 85
 average: 84.7
 Class average is above 80"""
 
+# The original broken script, read on the host. The scorer compares the fixed script with it.
+ORIGINAL_SCRIPT = (TASK_DIR / "sandbox" / "report.py").read_text()
+
+# The fix is one line. This allows a little slack for other valid fixes,
+# but fails a rewrite, such as replacing the script with print() calls.
+MAX_CHANGED_LINES = 3
+
+
+def changed_lines(before: str, after: str) -> int:
+    """Count lines changed between two scripts. A replaced line counts once, and trailing whitespace is ignored."""
+    a = [line.rstrip() for line in before.splitlines()]
+    b = [line.rstrip() for line in after.splitlines()]
+    removed = added = 0
+    for line in difflib.ndiff(a, b):
+        if line.startswith("- "):
+            removed += 1
+        elif line.startswith("+ "):
+            added += 1
+    return max(removed, added)
+
 
 @solver
 def reference_fix():
@@ -48,7 +69,7 @@ def no_fix():
 
 @scorer(metrics=[accuracy(), stderr()])
 def script_output():
-    """Run the script in the sandbox and compare its output to the expected output."""
+    """Run the script in the sandbox, compare its output to the expected output, and check the fix is small."""
 
     async def score(state: TaskState, target: Target) -> Score:
         try:
@@ -56,12 +77,26 @@ def script_output():
         except TimeoutError:
             return Score(value=INCORRECT, explanation="Script timed out")
         output = result.stdout.strip()
-        correct = result.success and output == target.text.strip()
-        return Score(
-            value=CORRECT if correct else INCORRECT,
-            answer=output,
-            explanation=result.stderr.strip() or f"exit code {result.returncode}",
-        )
+        if not (result.success and output == target.text.strip()):
+            return Score(
+                value=INCORRECT,
+                answer=output,
+                explanation=result.stderr.strip() or f"exit code {result.returncode}",
+            )
+
+        # The output is right. Check the script was fixed, not rewritten to print the answer.
+        try:
+            fixed_script = await sandbox().read_file(SCRIPT)
+        except FileNotFoundError:
+            return Score(value=INCORRECT, answer=output, explanation="Script is missing")
+        changed = changed_lines(ORIGINAL_SCRIPT, fixed_script)
+        if changed > MAX_CHANGED_LINES:
+            return Score(
+                value=INCORRECT,
+                answer=output,
+                explanation=f"Output is right, but {changed} lines changed (at most {MAX_CHANGED_LINES} allowed)",
+            )
+        return Score(value=CORRECT, answer=output, explanation=f"Output is right, and {changed} line(s) changed")
 
     return score
 
