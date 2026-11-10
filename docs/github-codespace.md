@@ -62,30 +62,70 @@ Start long runs inside tmux, so they keep going if VS Code disconnects, such as 
 tmux new -s eval
 ```
 
-Check the task without a model first, which is free. Expect accuracies of 1 and then 0:
+Check the task without a model first, which is free. Expect accuracies of 1 and then 0. The first command also builds the task's sandbox image, and shows its progress while it does:
 
 ```sh
 uv run inspect eval tasks/fix_syntax/fix_syntax.py -T solution=reference --model mockllm/model
 uv run inspect eval tasks/fix_syntax/fix_syntax.py -T solution=none --model mockllm/model
 ```
 
-Then run with the model:
+Then run the task's tests. `-v` prints each test as it finishes, so you can see progress. Expect `17 passed`:
 
 ```sh
-uv run inspect eval tasks/fix_syntax/fix_syntax.py --model google/gemini-3.6-flash --time-limit 600 --attempt-timeout 180
+uv run pytest tasks/fix_syntax/tests -v
 ```
+
+Then run with the model, starting with 2 samples:
+
+```sh
+uv run inspect eval tasks/fix_syntax/fix_syntax.py --model google/gemini-3.6-flash --limit 2 --max-connections 1 --time-limit 600 --attempt-timeout 180
+```
+
+Drop `--limit 2` to run every sample. Keep `--max-connections 1` on a free tier.
+
+- **`--limit`** runs only the first few samples.
+- **`--max-connections`** caps how many model requests run at once. On a free tier, 1 keeps the run under the rate limit.
 
 - **`--time-limit`** stops the sample after that many seconds, so a stuck run ends on its own.
 - **`--attempt-timeout`** abandons a model request that hasn't answered in time, then retries it. Without it, Inspect waits on a silent request forever, because model requests have no timeout by default.
 - **`--max-retries`** (optional) gives up after that many retries and shows the error. Leave it out on a free tier: Inspect waits and retries when it hits the rate limit, and a low limit makes the run give up when a short wait would have worked.
 
-To leave the tmux session running, press Ctrl+B, then D. After you reconnect, run `tmux attach -t eval` to see it again.
+tmux keys all start with Ctrl+B. Press it, let go, then press the next key:
+
+| Keys | What it does |
+|---|---|
+| Ctrl+B, then D | Detach: leave the session running in the background |
+| Ctrl+B, then C | Open a new window in the session, such as for `docker ps` while a run is going |
+| Ctrl+B, then N | Switch to the next window |
+
+After you reconnect, run `tmux attach -t eval` to see the session again, or `tmux ls` to list sessions. Ctrl+C works inside tmux the same as anywhere else.
 
 If tmux isn't available, `nohup` also keeps a run going after a disconnect:
 
 ```sh
 nohup uv run inspect eval tasks/fix_syntax/fix_syntax.py --model google/gemini-3.6-flash --time-limit 600 > tmp/eval.out 2>&1 &
 ```
+
+## How many Docker containers run
+
+Inside the codespace, Inspect uses Docker to build images and start containers. An image is the template, and a container is one running copy of it.
+
+- **One image per task.** For `fix_syntax`, Docker pulls `python:3.12-slim`, then builds the task's image from its `Dockerfile`. This happens on the first run only. Later runs reuse the image until the Dockerfile changes. `hello_docker` has no Dockerfile, so it pulls Inspect's default image, `aisiuk/inspect-tool-support`, instead.
+- **A new codespace starts with no images,** so its first run pulls and builds again. That's why the first run in a new codespace is slow.
+- **One container per sample.** Each sample, and each epoch of it, gets a fresh container from the task's image, which Inspect removes when the sample finishes. A full `fix_syntax` run starts 8 containers, one per sample.
+- **How many run at once.** Two limits apply, and the lower one wins:
+  - Inspect runs as many samples at once as `--max-connections` allows. With `--max-connections 1`, that's one sample, and one container, at a time.
+  - Inspect caps Docker sandboxes at twice the machine's CPU count. On a 2-core codespace, that's 4 containers at once.
+- **The test suite starts 29 containers in all,** from the same image: 8 each for the reference, no-fix, and file-permission tests, and 1 each for the 5 scorer edge-case tests. On a 2-core codespace, this takes a few minutes. On a laptop, it takes about 35 seconds.
+
+To see what Docker is doing, open a second tmux window (Ctrl+B, then C) and run:
+
+```sh
+docker images
+docker ps
+```
+
+`docker images` lists the images that have been built or pulled. `docker ps` lists the containers running right now.
 
 ## View logs
 
@@ -123,5 +163,8 @@ nohup uv run inspect eval tasks/fix_syntax/fix_syntax.py --model google/gemini-3
 | `No inspect tasks were found` | The codespace doesn't have the latest files. Run `git pull`, then `uv sync`. |
 | Files display in a small box with their own scrollbar | Safari has display problems with browser-based codespaces. Open the codespace in VS Code on your Mac instead. |
 | `Quota exceeded … generate_content_free_tier_requests, limit: 5` | Gemini's free tier allows only 5 requests per minute for this model, and each agent turn is one request. Changing timeouts won't help. Either slow Inspect down with `--max-connections 1`, a longer `--time-limit`, and no low `--max-retries` (Inspect waits and retries on its own), or enable billing for much higher limits. See [Cap spending with each model provider](safety-and-cost.md#cap-spending-with-each-model-provider). |
+| The tests or an eval seem stuck, with no output | Usually slow, not stuck. pytest prints nothing until the end unless you add `-v`, and the first run in a new codespace pulls and builds the image. Run the `-T solution=reference` eval first, which shows its progress, then the tests with `-v`. To check Docker, open a second tmux window (Ctrl+B, then C) and run `docker ps`. If it lists containers, it's working. If `docker info` hangs, restart the codespace. See [How many Docker containers run](#how-many-docker-containers-run). |
+| Ctrl+C doesn't stop a run | Inspect stops its containers before it exits, which can take a while. Press Ctrl+C again and wait about 30 seconds. If it's still stuck, open a second tmux window (Ctrl+B, then C) and run `pkill -f pytest` or `pkill -f "inspect eval"`, or end the whole session with `tmux kill-session -t eval`. |
+| Containers are left over after a stopped run | Run `uv run inspect sandbox cleanup docker`, which removes every container Inspect started. `docker ps` should then list none. |
 | An eval seems stuck while "generating" | The model is slow or rate-limited. Time it with `scripts/check_model.sh <model>`. Two minutes per reply is the model, not your setup. Try another model, and use `--attempt-timeout` and `--time-limit`. |
 | A run scored `C` but shows `model call cancelled` | A time limit cut off the run after the agent had already fixed the file. The scorer checks the file, not whether the agent submitted. Check the sample's limit field. |
