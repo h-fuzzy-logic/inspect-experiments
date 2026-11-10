@@ -18,7 +18,7 @@ The expected output, the answer key, is in `fix_syntax.py` on the host, so the a
 
 ## Run it
 
-**With a model.** Run this in a codespace only, with the provider's API key set as a Codespaces secret. See [API keys](../../README.md#api-keys). Each run costs a little:
+**With a model.** Run this in a codespace only, with the provider's API key set as a Codespaces secret. See [GitHub Codespaces](../../docs/github-codespace.md). Each run costs a little:
 
 ```sh
 uv run inspect eval tasks/fix_syntax/fix_syntax.py --model google/gemini-3.8-flash

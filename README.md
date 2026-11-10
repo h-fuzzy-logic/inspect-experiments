@@ -80,7 +80,8 @@ Inspect can run on your machine in a Python `.venv`, calls the model through the
 - [Evaluation Architecture](docs/eval-architecture.md): what the agent is made of, where each part runs, and how the agent works in its sandbox.
 - [Agent tool calls in the sandbox](docs/agent-sandbox-sequence.md): one turn of the agent loop, step by step.
 - [Safety and cost](docs/safety-and-cost.md): the security precautions this repo follows, and how it keeps costs down.
-- [Inspect learnings](docs/inspect-learnings.md): notes on design choices, security, and running in AWS or Codespaces.
+- [GitHub Codespaces](docs/github-codespace.md): how to set up a codespace and run evals with real models there.
+- [Inspect learnings](docs/inspect-learnings.md): notes on design choices, security, and running in AWS.
 
 ### If you want to run Inspect locally
 
@@ -120,7 +121,7 @@ The `hello` task doesn't use a sandbox, so step 5 tests Inspect but not Docker. 
 
 #### API keys
 
-Local runs use only the mock model (`--model mockllm/model`), which needs no key. Real model runs happen only in the cloud, which for now means a GitHub Codespace. No API keys are kept in this repo or on your machine.
+Local runs use only the mock model (`--model mockllm/model`), which needs no key. Real model runs happen only in the cloud, which for now means a GitHub Codespace. No API keys are kept in this repo or on your machine. For the full codespace setup, see [GitHub Codespaces](docs/github-codespace.md).
 
 To give a codespace a key:
 
