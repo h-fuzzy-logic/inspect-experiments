@@ -4,7 +4,7 @@ FROM python:3.12-slim
 RUN useradd --create-home agent && mkdir /workspace && chown agent:agent /workspace
 WORKDIR /workspace
 
-# Only the broken script goes in. The reference fix in solution/ stays on the host.
-COPY --chown=agent:agent sandbox/ /workspace/
+# No scripts are copied here. Inspect copies each sample's broken script into
+# /workspace when the sample starts. The fixes and expected outputs stay on the host.
 
 USER agent

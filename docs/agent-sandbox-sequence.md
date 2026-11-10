@@ -35,7 +35,7 @@ The model API doesn't remember anything between calls. Inspect keeps the convers
 
 ## A full run: fix_syntax
 
-The diagram above shows one turn. This one shows a whole run of the `fix_syntax` task, from building the sandbox to scoring and cleanup. The agent turns in the middle are the loop above.
+The diagram above shows one turn. This one shows a whole run of one `fix_syntax` sample, from building the sandbox to scoring and cleanup. Each sample gets its own container, so this repeats for every sample. The agent turns in the middle are the loop above.
 
 ```mermaid
 sequenceDiagram
@@ -53,10 +53,11 @@ sequenceDiagram
         D->>H: Pull python:3.12-slim
         H-->>D: Base image
     end
-    D->>D: Build image: agent user, /workspace, copy sandbox/report.py
+    D->>D: Build image: agent user, empty /workspace
     Note over D: Later runs reuse the built image
     I->>D: Start container
     D->>S: Start (no network)
+    I->>S: Copy this sample's broken.py into /workspace
 
     loop Agent turns
         I->>M: Send conversation
@@ -66,15 +67,16 @@ sequenceDiagram
     end
     M-->>I: Tool call: submit()
 
-    I->>S: Scorer runs python3 /workspace/report.py
-    S-->>I: Output and exit code
-    I->>I: Compare with expected output (kept on host): C or I
+    I->>S: Scorer runs the sample's script, and reads it back
+    S-->>I: Output, exit code, and the fixed script
+    I->>I: Compare with expected.txt and broken.py (kept on host): C or I
     I->>D: Remove container
     I->>I: Write log to logs/
 ```
 
 - **Steps 1–2:** Inspect finds the `Dockerfile` in the task's folder, so it builds an image instead of using its default one. See [How Inspect picks the sandbox image](eval-architecture.md#how-inspect-picks-the-sandbox-image).
-- **Steps 3–6:** Docker pulls the base image only on the first run, then builds the task's image. Only `sandbox/` is copied in, so the reference fix in `solution/` never reaches the container.
+- **Steps 3–6:** Docker pulls the base image only on the first run, then builds the task's image. The image contains no scripts.
+- **Step 9:** Inspect copies only this sample's `broken.py` into the container. The reference fix (`fixed.py`) and the answer key (`expected.txt`) never reach it.
 - **The agent loop:** the model calls `bash()` until it submits. The container has no network, so it can only run commands.
-- **Scoring:** the scorer runs the script in the same container, then compares the output with the expected output, which is kept on the host so the agent can't change it.
+- **Scoring:** the scorer runs the script in the same container and reads it back. It checks the output against `expected.txt`, and checks that at most 3 lines differ from `broken.py`. Both files are kept on the host, so the agent can't change them.
 - **Cleanup:** Inspect removes the container. The image stays, so the next run starts faster.

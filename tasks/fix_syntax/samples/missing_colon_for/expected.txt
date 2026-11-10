@@ -1,0 +1,3 @@
+pears: out of stock
+total items: 19
+Stock is fine

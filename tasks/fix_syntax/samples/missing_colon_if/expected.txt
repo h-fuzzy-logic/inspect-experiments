@@ -1,0 +1,5 @@
+alice: 91
+bob: 78
+carol: 85
+average: 84.7
+Class average is above 80

@@ -1,0 +1,4 @@
+Hello, Ada!
+Hello, Grace!
+Hello, Linus!
+Greeted 3 people

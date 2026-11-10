@@ -21,8 +21,8 @@ The precautions this repo follows when running evals, and how it keeps costs dow
 
 ### Keeping the answers out of reach
 
-- **The answer key stays on the host.** The expected output is in the task's `.py` file, which runs outside the sandbox, so the agent can't read or change it.
-- **The reference solution never enters the sandbox,** except on purpose with `-T solution=reference`. A `.dockerignore` allow-list hides everything but `sandbox/` from the Docker build, so even a `COPY .` line couldn't pull in `solution/` or the answer key.
+- **The answer key stays on the host.** Each `fix_syntax` sample's expected output is in `expected.txt` on the host, so the agent can't read or change it.
+- **The reference solution never enters the sandbox,** except on purpose with `-T solution=reference`. Inspect copies only each sample's broken script into its sandbox. A `.dockerignore` hides the whole task folder from the Docker build, so even a `COPY .` line couldn't pull in the fixes or the answer keys.
 
 ### Gaps
 

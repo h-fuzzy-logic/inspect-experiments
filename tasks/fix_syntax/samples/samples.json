@@ -1,0 +1,10 @@
+[
+  {"id": "missing_colon_if", "script": "report.py", "error": "Missing colon after an if condition"},
+  {"id": "missing_colon_for", "script": "inventory.py", "error": "Missing colon after a for loop"},
+  {"id": "unclosed_paren", "script": "temperatures.py", "error": "Unclosed parenthesis in a print call"},
+  {"id": "unclosed_string", "script": "greeting.py", "error": "Unclosed string literal"},
+  {"id": "bad_indent", "script": "shipping.py", "error": "Indentation that matches no outer block"},
+  {"id": "assign_in_condition", "script": "attendance.py", "error": "Assignment (=) instead of comparison (==) in a condition"},
+  {"id": "missing_comma", "script": "prices.py", "error": "Missing comma between dictionary entries"},
+  {"id": "else_if", "script": "grades.py", "error": "else if instead of elif"}
+]
