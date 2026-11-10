@@ -5,7 +5,7 @@
 #
 # Usage:
 #   scripts/check_model.sh list               # list available Gemini models (free)
-#   scripts/check_model.sh gemini-3.8-flash   # send one short prompt (costs a fraction of a cent)
+#   scripts/check_model.sh gemini-3.6-flash   # send one short prompt (costs a fraction of a cent)
 set -u
 
 if [ "${CODESPACES:-}" != "true" ]; then

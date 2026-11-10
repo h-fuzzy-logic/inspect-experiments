@@ -49,7 +49,7 @@ Codespace (devcontainers/python image)
 
    ```sh
    scripts/check_model.sh list
-   scripts/check_model.sh gemini-3.8-flash
+   scripts/check_model.sh gemini-3.6-flash
    ```
 
    The first lists the Gemini models your key can use, which is free. The second sends one short prompt and prints the status code and how long the reply took. The script refuses to run outside a codespace.
@@ -72,7 +72,7 @@ uv run inspect eval tasks/fix_syntax/fix_syntax.py -T solution=none --model mock
 Then run with the model:
 
 ```sh
-uv run inspect eval tasks/fix_syntax/fix_syntax.py --model google/gemini-3.8-flash --time-limit 600 --attempt-timeout 180
+uv run inspect eval tasks/fix_syntax/fix_syntax.py --model google/gemini-3.6-flash --time-limit 600 --attempt-timeout 180
 ```
 
 - **`--time-limit`** stops the sample after that many seconds, so a stuck run ends on its own.
@@ -84,7 +84,7 @@ To leave the tmux session running, press Ctrl+B, then D. After you reconnect, ru
 If tmux isn't available, `nohup` also keeps a run going after a disconnect:
 
 ```sh
-nohup uv run inspect eval tasks/fix_syntax/fix_syntax.py --model google/gemini-3.8-flash --time-limit 600 > tmp/eval.out 2>&1 &
+nohup uv run inspect eval tasks/fix_syntax/fix_syntax.py --model google/gemini-3.6-flash --time-limit 600 > tmp/eval.out 2>&1 &
 ```
 
 ## View logs
