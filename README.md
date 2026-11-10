@@ -131,7 +131,7 @@ To give a codespace a key:
 Then, in the codespace, run a task with a real model:
 
 ```sh
-uv run inspect eval tasks/fix_syntax/fix_syntax.py --model google/gemini-2.5-flash
+uv run inspect eval tasks/fix_syntax/fix_syntax.py --model google/gemini-3.8-flash
 ```
 
 Check the provider's current model list for the exact name.
