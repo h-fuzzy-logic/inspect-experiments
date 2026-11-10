@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Check that a Gemini model answers, and how long it takes.
 # Runs in a codespace only. Reads the key from $GOOGLE_API_KEY and never prints it.
+# See docs/github-codespace.md.
 #
 # Usage:
 #   scripts/check_model.sh list               # list available Gemini models (free)
