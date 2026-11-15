@@ -130,6 +130,17 @@ Found by reading the logs and transcripts of real runs.
 </tbody>
 </table>
 
+### Findings by source
+
+The scorer was the most common source of problems in this task: 5 of the 11 findings.
+
+| Source | Findings | Count |
+|---|---|---|
+| Scorer | QA-002, QA-004, QA-009, QA-010, QA-011 | 5 |
+| Leaks | QA-003, QA-007, QA-008 | 3 |
+| Harness | QA-005, QA-006 | 2 |
+| Environment | QA-001 | 1 |
+
 ## Passes by QA round (mock)
 
 ![Mock: passes per model under scorer v1, re-scored with scorer v2, and after task fixes](figures/mock-qa-rounds.png)
