@@ -1,0 +1,15 @@
+{
+  "mock": true,
+  "note": "MOCK DATA. No human baseline has been run yet. Replace with real timings from Inspect's human agent.",
+  "baseliner": "task author",
+  "samples": {
+    "missing_colon_if": {"estimate_minutes": 1, "measured_minutes": 1.5},
+    "missing_colon_for": {"estimate_minutes": 1, "measured_minutes": 1.0},
+    "unclosed_paren": {"estimate_minutes": 1, "measured_minutes": 2.0},
+    "unclosed_string": {"estimate_minutes": 1, "measured_minutes": 1.5},
+    "bad_indent": {"estimate_minutes": 2, "measured_minutes": 3.5},
+    "assign_in_condition": {"estimate_minutes": 1, "measured_minutes": 1.0},
+    "missing_comma": {"estimate_minutes": 1.5, "measured_minutes": 2.5},
+    "else_if": {"estimate_minutes": 1, "measured_minutes": 1.5}
+  }
+}
