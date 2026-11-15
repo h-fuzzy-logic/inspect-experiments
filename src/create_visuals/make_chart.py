@@ -9,23 +9,14 @@ import argparse
 import json
 from pathlib import Path
 
-import matplotlib
-matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-S='#fcfcfb';T1='#0b0b0b';T2='#52514e';GR='#e4e3df';A='#2a78d6';B='#eb6834'
-MODEL_COLORS=[A,B]
-plt.rcParams.update({'font.family':'DejaVu Sans','font.size':11,'axes.edgecolor':GR,'axes.labelcolor':T2,
-  'xtick.color':T2,'ytick.color':T2,'figure.facecolor':S,'axes.facecolor':S,'savefig.facecolor':S})
+from style import GRID as GR, SERIES as MODEL_COLORS, TEXT as T1, TEXT_2 as T2, header
 
 
 def make_chart(data, out_path):
     f,ax=plt.subplots(figsize=(8,4.6));f.subplots_adjust(top=0.78,bottom=0.14,left=0.1,right=0.78)
-    f.text(0.035,0.95,data['title'],fontsize=14,fontweight='bold',color=T1,va='top')
-    f.text(0.035,0.885,data['subtitle'],fontsize=10.5,color=T2,va='top')
-    if data.get('mock'):
-        f.text(0.965,0.95,'MOCK DATA',fontsize=9,fontweight='bold',color='#a33a2f',va='top',ha='right',
-               bbox=dict(boxstyle='round,pad=0.35',fc='#f8e3e0',ec='none'))
+    header(f,data['title'],data['subtitle'],data.get('mock'))
     for s in ['top','right','left']: ax.spines[s].set_visible(False)
     ax.tick_params(length=0);ax.yaxis.grid(True,color=GR,lw=1);ax.set_axisbelow(True)
 

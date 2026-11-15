@@ -1,0 +1,557 @@
+{
+  "title": "Fixing syntax errors",
+  "mock": false,
+  "generated": "2026-11-11T01:24:05+00:00",
+  "models": [
+    {
+      "model": "anthropic/claude-haiku-5-5",
+      "task": "fix_syntax",
+      "log": "2026-11-10T13-38-46-00-00_fix-syntax_mYKDRDusH7qaoiQ7sfeiHA.eval",
+      "created": "2026-11-10T13:38:46+00:00",
+      "scorer": "script_output",
+      "samples": 8,
+      "epochs": 3,
+      "scored_runs": 24,
+      "accuracy": 1.0,
+      "stderr": 0.0,
+      "limit_hits": 0,
+      "errors": 0,
+      "mean_messages": 7.3,
+      "mean_seconds_per_run": 5.2,
+      "duration_seconds": 139.0,
+      "tokens": {
+        "input": 200,
+        "output": 10870,
+        "cache_write": 12690,
+        "cache_read": 66852,
+        "reasoning": 1810,
+        "total": 90612
+      },
+      "per_sample": {
+        "assign_in_condition": {
+          "pass_rate": 1.0,
+          "runs": 3,
+          "epochs": [
+            {
+              "epoch": 1,
+              "score": 1.0,
+              "limit": null,
+              "error": false,
+              "seconds": 5.795
+            },
+            {
+              "epoch": 2,
+              "score": 1.0,
+              "limit": null,
+              "error": false,
+              "seconds": 5.827
+            },
+            {
+              "epoch": 3,
+              "score": 1.0,
+              "limit": null,
+              "error": false,
+              "seconds": 5.121
+            }
+          ],
+          "metadata": {
+            "script": "/workspace/attendance.py",
+            "error": "Assignment (=) instead of comparison (==) in a condition"
+          }
+        },
+        "bad_indent": {
+          "pass_rate": 1.0,
+          "runs": 3,
+          "epochs": [
+            {
+              "epoch": 1,
+              "score": 1.0,
+              "limit": null,
+              "error": false,
+              "seconds": 5.506
+            },
+            {
+              "epoch": 2,
+              "score": 1.0,
+              "limit": null,
+              "error": false,
+              "seconds": 5.97
+            },
+            {
+              "epoch": 3,
+              "score": 1.0,
+              "limit": null,
+              "error": false,
+              "seconds": 5.966
+            }
+          ],
+          "metadata": {
+            "script": "/workspace/shipping.py",
+            "error": "Indentation that matches no outer block"
+          }
+        },
+        "else_if": {
+          "pass_rate": 1.0,
+          "runs": 3,
+          "epochs": [
+            {
+              "epoch": 1,
+              "score": 1.0,
+              "limit": null,
+              "error": false,
+              "seconds": 3.467
+            },
+            {
+              "epoch": 2,
+              "score": 1.0,
+              "limit": null,
+              "error": false,
+              "seconds": 4.185
+            },
+            {
+              "epoch": 3,
+              "score": 1.0,
+              "limit": null,
+              "error": false,
+              "seconds": 3.997
+            }
+          ],
+          "metadata": {
+            "script": "/workspace/grades.py",
+            "error": "else if instead of elif"
+          }
+        },
+        "missing_colon_for": {
+          "pass_rate": 1.0,
+          "runs": 3,
+          "epochs": [
+            {
+              "epoch": 1,
+              "score": 1.0,
+              "limit": null,
+              "error": false,
+              "seconds": 5.019
+            },
+            {
+              "epoch": 2,
+              "score": 1.0,
+              "limit": null,
+              "error": false,
+              "seconds": 4.437
+            },
+            {
+              "epoch": 3,
+              "score": 1.0,
+              "limit": null,
+              "error": false,
+              "seconds": 4.324
+            }
+          ],
+          "metadata": {
+            "script": "/workspace/inventory.py",
+            "error": "Missing colon after a for loop"
+          }
+        },
+        "missing_colon_if": {
+          "pass_rate": 1.0,
+          "runs": 3,
+          "epochs": [
+            {
+              "epoch": 1,
+              "score": 1.0,
+              "limit": null,
+              "error": false,
+              "seconds": 5.037
+            },
+            {
+              "epoch": 2,
+              "score": 1.0,
+              "limit": null,
+              "error": false,
+              "seconds": 4.031
+            },
+            {
+              "epoch": 3,
+              "score": 1.0,
+              "limit": null,
+              "error": false,
+              "seconds": 4.237
+            }
+          ],
+          "metadata": {
+            "script": "/workspace/report.py",
+            "error": "Missing colon after an if condition"
+          }
+        },
+        "missing_comma": {
+          "pass_rate": 1.0,
+          "runs": 3,
+          "epochs": [
+            {
+              "epoch": 1,
+              "score": 1.0,
+              "limit": null,
+              "error": false,
+              "seconds": 8.089
+            },
+            {
+              "epoch": 2,
+              "score": 1.0,
+              "limit": null,
+              "error": false,
+              "seconds": 9.711
+            },
+            {
+              "epoch": 3,
+              "score": 1.0,
+              "limit": null,
+              "error": false,
+              "seconds": 6.818
+            }
+          ],
+          "metadata": {
+            "script": "/workspace/prices.py",
+            "error": "Missing comma between dictionary entries"
+          }
+        },
+        "unclosed_paren": {
+          "pass_rate": 1.0,
+          "runs": 3,
+          "epochs": [
+            {
+              "epoch": 1,
+              "score": 1.0,
+              "limit": null,
+              "error": false,
+              "seconds": 4.203
+            },
+            {
+              "epoch": 2,
+              "score": 1.0,
+              "limit": null,
+              "error": false,
+              "seconds": 4.32
+            },
+            {
+              "epoch": 3,
+              "score": 1.0,
+              "limit": null,
+              "error": false,
+              "seconds": 4.436
+            }
+          ],
+          "metadata": {
+            "script": "/workspace/temperatures.py",
+            "error": "Unclosed parenthesis in a print call"
+          }
+        },
+        "unclosed_string": {
+          "pass_rate": 1.0,
+          "runs": 3,
+          "epochs": [
+            {
+              "epoch": 1,
+              "score": 1.0,
+              "limit": null,
+              "error": false,
+              "seconds": 6.599
+            },
+            {
+              "epoch": 2,
+              "score": 1.0,
+              "limit": null,
+              "error": false,
+              "seconds": 3.831
+            },
+            {
+              "epoch": 3,
+              "score": 1.0,
+              "limit": null,
+              "error": false,
+              "seconds": 4.31
+            }
+          ],
+          "metadata": {
+            "script": "/workspace/greeting.py",
+            "error": "Unclosed string literal"
+          }
+        }
+      }
+    },
+    {
+      "model": "anthropic/claude-sonnet-5-5",
+      "task": "fix_syntax",
+      "log": "2026-11-11T01-14-16-00-00_fix-syntax_BGDPt6oYueHmij9uYGCwz2.eval",
+      "created": "2026-11-11T01:14:16+00:00",
+      "scorer": "script_output",
+      "samples": 8,
+      "epochs": 3,
+      "scored_runs": 24,
+      "accuracy": 1.0,
+      "stderr": 0.0,
+      "limit_hits": 0,
+      "errors": 0,
+      "mean_messages": 7,
+      "mean_seconds_per_run": 7.1,
+      "duration_seconds": 162.0,
+      "tokens": {
+        "input": 192,
+        "output": 6381,
+        "cache_write": 6289,
+        "cache_read": 61484,
+        "reasoning": 201,
+        "total": 74346
+      },
+      "per_sample": {
+        "assign_in_condition": {
+          "pass_rate": 1.0,
+          "runs": 3,
+          "epochs": [
+            {
+              "epoch": 1,
+              "score": 1.0,
+              "limit": null,
+              "error": false,
+              "seconds": 8.523
+            },
+            {
+              "epoch": 2,
+              "score": 1.0,
+              "limit": null,
+              "error": false,
+              "seconds": 6.501
+            },
+            {
+              "epoch": 3,
+              "score": 1.0,
+              "limit": null,
+              "error": false,
+              "seconds": 6.138
+            }
+          ],
+          "metadata": {
+            "script": "/workspace/attendance.py",
+            "error": "Assignment (=) instead of comparison (==) in a condition"
+          }
+        },
+        "bad_indent": {
+          "pass_rate": 1.0,
+          "runs": 3,
+          "epochs": [
+            {
+              "epoch": 1,
+              "score": 1.0,
+              "limit": null,
+              "error": false,
+              "seconds": 6.496
+            },
+            {
+              "epoch": 2,
+              "score": 1.0,
+              "limit": null,
+              "error": false,
+              "seconds": 10.766
+            },
+            {
+              "epoch": 3,
+              "score": 1.0,
+              "limit": null,
+              "error": false,
+              "seconds": 9.438
+            }
+          ],
+          "metadata": {
+            "script": "/workspace/shipping.py",
+            "error": "Indentation that matches no outer block"
+          }
+        },
+        "else_if": {
+          "pass_rate": 1.0,
+          "runs": 3,
+          "epochs": [
+            {
+              "epoch": 1,
+              "score": 1.0,
+              "limit": null,
+              "error": false,
+              "seconds": 5.097
+            },
+            {
+              "epoch": 2,
+              "score": 1.0,
+              "limit": null,
+              "error": false,
+              "seconds": 4.846
+            },
+            {
+              "epoch": 3,
+              "score": 1.0,
+              "limit": null,
+              "error": false,
+              "seconds": 5.218
+            }
+          ],
+          "metadata": {
+            "script": "/workspace/grades.py",
+            "error": "else if instead of elif"
+          }
+        },
+        "missing_colon_for": {
+          "pass_rate": 1.0,
+          "runs": 3,
+          "epochs": [
+            {
+              "epoch": 1,
+              "score": 1.0,
+              "limit": null,
+              "error": false,
+              "seconds": 6.863
+            },
+            {
+              "epoch": 2,
+              "score": 1.0,
+              "limit": null,
+              "error": false,
+              "seconds": 5.77
+            },
+            {
+              "epoch": 3,
+              "score": 1.0,
+              "limit": null,
+              "error": false,
+              "seconds": 7.2
+            }
+          ],
+          "metadata": {
+            "script": "/workspace/inventory.py",
+            "error": "Missing colon after a for loop"
+          }
+        },
+        "missing_colon_if": {
+          "pass_rate": 1.0,
+          "runs": 3,
+          "epochs": [
+            {
+              "epoch": 1,
+              "score": 1.0,
+              "limit": null,
+              "error": false,
+              "seconds": 7.324
+            },
+            {
+              "epoch": 2,
+              "score": 1.0,
+              "limit": null,
+              "error": false,
+              "seconds": 5.669
+            },
+            {
+              "epoch": 3,
+              "score": 1.0,
+              "limit": null,
+              "error": false,
+              "seconds": 7.962
+            }
+          ],
+          "metadata": {
+            "script": "/workspace/report.py",
+            "error": "Missing colon after an if condition"
+          }
+        },
+        "missing_comma": {
+          "pass_rate": 1.0,
+          "runs": 3,
+          "epochs": [
+            {
+              "epoch": 1,
+              "score": 1.0,
+              "limit": null,
+              "error": false,
+              "seconds": 4.815
+            },
+            {
+              "epoch": 2,
+              "score": 1.0,
+              "limit": null,
+              "error": false,
+              "seconds": 4.557
+            },
+            {
+              "epoch": 3,
+              "score": 1.0,
+              "limit": null,
+              "error": false,
+              "seconds": 5.191
+            }
+          ],
+          "metadata": {
+            "script": "/workspace/prices.py",
+            "error": "Missing comma between dictionary entries"
+          }
+        },
+        "unclosed_paren": {
+          "pass_rate": 1.0,
+          "runs": 3,
+          "epochs": [
+            {
+              "epoch": 1,
+              "score": 1.0,
+              "limit": null,
+              "error": false,
+              "seconds": 7.399
+            },
+            {
+              "epoch": 2,
+              "score": 1.0,
+              "limit": null,
+              "error": false,
+              "seconds": 8.539
+            },
+            {
+              "epoch": 3,
+              "score": 1.0,
+              "limit": null,
+              "error": false,
+              "seconds": 9.409
+            }
+          ],
+          "metadata": {
+            "script": "/workspace/temperatures.py",
+            "error": "Unclosed parenthesis in a print call"
+          }
+        },
+        "unclosed_string": {
+          "pass_rate": 1.0,
+          "runs": 3,
+          "epochs": [
+            {
+              "epoch": 1,
+              "score": 1.0,
+              "limit": null,
+              "error": false,
+              "seconds": 6.744
+            },
+            {
+              "epoch": 2,
+              "score": 1.0,
+              "limit": null,
+              "error": false,
+              "seconds": 14.293
+            },
+            {
+              "epoch": 3,
+              "score": 1.0,
+              "limit": null,
+              "error": false,
+              "seconds": 6.443
+            }
+          ],
+          "metadata": {
+            "script": "/workspace/greeting.py",
+            "error": "Unclosed string literal"
+          }
+        }
+      }
+    }
+  ]
+}
