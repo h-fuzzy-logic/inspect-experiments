@@ -126,7 +126,8 @@ The per-sample grid is in [figures/samples.png](figures/samples.png).
 QA checks that a score reflects the model, not a flaw in the task. Eleven findings so far, all in [QA.md](QA.md):
 
 - **Fixed:** a file-permission bug (QA-001), a scoring shortcut (QA-002), an answer-leak risk (QA-003), and two harness issues with limits and stalled model calls (QA-005, QA-006). Paid API keys only, so the task can't leak into training data through the model provider (QA-007).
-- **Open:** four wrong fixes still pass because they print the right output for this data: a hardcoded condition (QA-004), a hardcoded value (QA-009), a looser comparison (QA-010), and deleting the broken line (QA-011). The canary string isn't yet in the files that hold the answers (QA-008).
+- **Open:** four wrong fixes still pass because they print the right output for this data: a hardcoded condition (QA-004), a hardcoded value (QA-009), a looser comparison (QA-010), and deleting the broken line (QA-011).
+- **Closed as won't fix:** the canary string isn't in the files that hold the answers (QA-008). A canary protects a task's held-out value, and this task has none: its samples are common syntax errors.
 - **Tests:** 23. 19 pass, including one for each fixed shortcut and leak, and each checks the scorer's recorded reason for a pass or fail, not just the score. The other 4 are expected failures (`xfail`) that track the open shortcuts.
 - **Failures to review:** none yet, since both models passed every run.
 
@@ -191,13 +192,12 @@ Fixable issues in the current version.
 
 | Issue | Why it matters | Fix |
 |---|---|---|
-| **Canary coverage** ([QA-008](QA.md#spec-and-scorer-review)) | The canary is only on the two write-up pages. The sample files, which hold the answers, don't carry it | Add it as a comment to the sample scripts, `fix_syntax.py`, and the task README |
 | **Sandbox image not pinned** | `python:3.12-slim` changes as new builds are published, so a rerun may not use the same environment | Pin the image by digest in the `Dockerfile` |
 | **Numbers copied by hand** | The tables on this page are copied from `results/results.json`, so they can drift from the data after a rerun | Generate the tables from the results file, the way the figures are |
 | **No time limit in the task** | The task sets a message limit, but the 600-second limit is only on the command line. A run started without `--time-limit` has none | Set `time_limit` in `fix_syntax.py` |
 | **Chart row order** | The run and sample grids list samples alphabetically, as they come back in the log, not in the order of `samples.json` | Add a row-order option to `make_results_chart.py` |
 
-The open scoring shortcut ([QA-004](QA.md#spec-and-scorer-review)) is tracked in the QA log, and its fix is part of the next version.
+The open scoring shortcut ([QA-004](QA.md#spec-and-scorer-review)) is left open by design. The pipeline task's scorer checks behavior on hidden inputs, which closes this class of shortcut.
 
 
 ## Files

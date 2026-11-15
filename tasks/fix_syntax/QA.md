@@ -78,9 +78,10 @@ Found by reading the instructions, scorer, and terms, looking for ways to pass o
 <td>Recorded in <a href="../../docs/safety-and-cost.md">safety-and-cost.md</a></td>
 </tr>
 <tr valign="top">
-<td>QA-008</td><td>Data (leak, open)</td><td>Medium</td>
+<td>QA-008</td><td>Data (leak, won't fix)</td><td>Medium</td>
 <td>The canary string is only in <code>RESULTS.md</code> and <code>QA.md</code>. Training-data filters check one document at a time, so the sample files, which hold the answers, could be collected without it</td>
-<td>Won't fix. Since a canary protects held-out value and this task has none (common syntax errors).</td>
+<td>Won't fix. A canary protects a task's held-out value, and this task has none: its samples are common syntax errors</td>
+<td>Not applicable</td>
 </tr>
 <tr valign="top">
 <td>QA-009</td><td>Shortcut (false pass, open)</td><td>Medium</td>

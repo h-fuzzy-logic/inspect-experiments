@@ -50,7 +50,7 @@ For the details behind these choices, see [README.md](README.md), [RESULTS.md](R
 |---|---|---|
 | Where answers live | Host only, scorer-only files, or a separate container | Host only. `fixed.py` and `expected.txt` never enter the sandbox |
 | Guards against leaks | `.dockerignore`, no `COPY` of task files, permissions | `.dockerignore` hides the whole task folder from the build, and the Dockerfile has no `COPY` (QA-003) |
-| Canary string | Whether to add one, and in which files | Yes. It's in `RESULTS.md` and `QA.md`, but not yet in the sample files that hold the answers (QA-008, open) |
+| Canary string | Whether to add one, and in which files | Only in `RESULTS.md` and `QA.md`, not in the sample files. A canary protects a task's held-out value, and this task has none: its samples are common syntax errors (QA-008, won't fix) |
 | Public or private task | Whether samples and answers go in a public repo | Public: this is a portfolio repo. Acceptable for a warm-up task |
 
 ### Prompts
