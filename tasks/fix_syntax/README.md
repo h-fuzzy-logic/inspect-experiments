@@ -2,7 +2,7 @@
 
 A very simple bug-fix task. Each sample is a short Python script with one syntax error. The agent has to find and fix the error so the script runs and prints the right output.
 
-**Results and QA:** see [RESULTS.md](RESULTS.md) for model results and figures, and [QA.md](QA.md) for the QA log, tests, and failure review. Some sections are still mock and are labeled as such.
+**Results and QA:** see [RESULTS.md](RESULTS.md) for model results and figures, [QA.md](QA.md) for the QA log, tests, and failure review, and [task-decisions.md](task-decisions.md) for the design and run choices. Some sections are still mock and are labeled as such.
 
 ## Samples
 
@@ -59,6 +59,7 @@ These errors are easy, so most models will probably score near 1.0. A task that 
 | `tests/test_scorer.py` | Host only | Automated tests for the samples and the scorer |
 | `RESULTS.md` | Host only | Results and figures |
 | `QA.md` | Host only | QA log, tests, failure review, and transcripts |
+| `task-decisions.md` | Host only | Every design and run choice, from the [task decisions template](../../docs/task-decisions-template.md) |
 | `results/` | Host only | Per-model results from the eval logs, plus mock data files (`mock-*.json`) for charts without real data yet |
 | `figures/` | Host only | The charts in `RESULTS.md`. Files starting with `mock-` are mock |
 
