@@ -112,15 +112,51 @@ For the details behind these choices, see [README.md](README.md), [RESULTS.md](R
 | What each test asserts | The score only, or the score and its reason | Both: each test checks the verdict, so a test can't pass for the wrong reason |
 | When tests run | By hand, before each real run, or in CI | By hand. CI is **Open** |
 
+### Solvability checks
+
+| Decision | Options to consider | Choice and reason |
+|---|---|---|
+| Reference solution | Write the intended solution and run the scorer on it | Yes. Each sample has a `fixed.py`. `test_all_reference_fixes_pass` scores every one in the real sandbox, and `-T solution=reference` does the same from the command line |
+| Pre-fix failure check | Confirm every sample fails before any fix | Yes. `test_sample_files_are_consistent` checks each `broken.py` has a syntax error, and `test_all_broken_scripts_fail` checks each scores `still_broken` in the sandbox |
+| Clean-room dry run | Solve it in the sandbox, as the agent's user, with only the agent's tools | Partly. `test_agent_user_can_edit_every_script` edits every script with `sed -i` as the `agent` user. A full solve by hand in the sandbox is **Open**; the human baseline would cover it |
+| Independent baseline | Someone other than the author solves it from the instructions alone | **Open.** The planned baseliner is the author |
+| Alternative solution | A second valid approach must also pass | Yes. `test_other_one_line_fix_passes` and `test_separate_if_instead_of_elif_passes` |
+| Limits check | Time the reference solution against the task's limits | Not as a timed check. Each fix is one line, and the limits are set well above what that needs |
+| Repeat builds | Rebuild and score the reference solution several times | Not done on purpose. The samples are fixed files with no randomness, so there's little to vary. **Open** |
+| Milestone checks | Check each intermediate goal can be reached | Not applicable: each sample is a single step |
+
+### Spec review
+
+| Decision | Options to consider | Choice and reason |
+|---|---|---|
+| Second reading | List every plausible interpretation of each sentence | **Open** |
+| Spec-to-scorer traceability | Map every scorer check to a sentence, and every sentence to a check | Yes, below. "Fix the error" is only checked through its effects, which is where the open shortcuts come from |
+| Assumption audit | List what a human engineer would assume, and check each is stated | **Open** |
+| Cold read | Someone else restates the goal and how success is judged | **Open** |
+| Question probing | Write a careful contractor's questions, and check the instructions answer them | **Open** |
+| Literal-compliance attack | Satisfy the instructions literally while breaking their intent | Yes, as part of red-teaming the scorer: replacing the script with a `print()` of the answer, `if True:`, a hardcoded value, a looser comparison, and deleting the broken line |
+| Terminology check | The same name for the same thing in the prompt, files, and code | **Open** |
+| Severity rating | Rate each sample's underspecification | Not used. With 8 similar samples and one reviewer, a rating scale adds little |
+| Where the review is recorded | A spec file, the QA log, or both | Findings in [QA.md](QA.md). The traceability table is in this file |
+
+**Traceability: instructions to scorer checks**
+
+| Instruction | Scorer check |
+|---|---|
+| "Fix the error so that `python3 <script>` runs successfully" | The script exits with code 0 (else `still_broken`), within 30 seconds (else `timed_out`) |
+| "Don't change what the script prints" | The output matches `expected.txt`, apart from surrounding whitespace (else `wrong_output`) |
+| "Change as little as possible" | At most 3 lines differ from `broken.py` (else `rewritten`) |
+| "The Python script `<script>`" | The script must still exist at that path (else `missing`) |
+| "Fails with a syntax error" (the fix should repair that error, not change the logic) | No direct check. Wrong fixes that print the right output still pass (QA-004, QA-009 to QA-011) |
+| "When you're done, submit" | Not scored, by design. The scorer checks the files, not the submission |
+
 ### Build-time QA
 
 | Decision | Options to consider | Choice and reason |
 |---|---|---|
-| How much QA | A quick check, or a full pass with a written log | A full pass with a written log, to practice the method on a small task |
-| Spec review | Anything ambiguous, or unstated but scored? | Yes. Write the prompt's constraints to match the scorer's checks, so nothing is scored that isn't stated |
+| How much QA | A quick check, or a full pass with a written log | A full pass with a written log, to practice the method on a small task. The checks used are marked in the two sections above |
 | Red-teaming the scorer | List wrong solutions that could pass, and test each | Yes. Write wrong fixes on purpose, check whether the scorer passes them, and log each one that does |
 | Leak audit | Can the agent find the answer in the sandbox? | Yes. Check the image, the build context, and the files copied in. Also check the model provider's data terms and which files carry the canary |
-| Solvability check | Run the reference solution in the real sandbox | Yes, in the tests and with `-T solution=reference` |
 | QA log | Where findings go, and their fields | [QA.md](QA.md): ID, type, severity, how found, fix, and how verified, grouped by stage |
 | When QA is done | The point at which the task is ready for real runs | Tests pass and no high-severity findings are open. Open findings are listed as limitations |
 
@@ -207,6 +243,7 @@ For the details behind these choices, see [README.md](README.md), [RESULTS.md](R
 | What to look for | Shortcuts, environment problems, unclear instructions, scorer mistakes | All four |
 | Passes to check | Read some passes to catch false passes | Check the verdict and `lines_changed` for every pass. **Open:** reading a sample of pass transcripts |
 | Failure review | Model's fault or the task's | Each failure goes in the failure review in [QA.md](QA.md) |
+| Failure clustering | When several models fail the same way, check the spec first | Yes. A failure shared across models is checked against the spec before it's counted as a model failure |
 | Verdict counts | Do the reasons match expectations? | Yes, printed by `summarize_results.py` and reported in RESULTS |
 | Limit hits and errors | From the model or the setup? | Counted per model, and each one read to find its cause (QA-005, QA-006) |
 | Flakiness | Do repeat runs disagree? | Compare the 3 epochs of each sample, and repeat evals of each model |
