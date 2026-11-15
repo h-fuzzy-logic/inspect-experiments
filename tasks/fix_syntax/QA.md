@@ -80,8 +80,7 @@ Found by reading the instructions, scorer, and terms, looking for ways to pass o
 <tr valign="top">
 <td>QA-008</td><td>Data (leak, open)</td><td>Medium</td>
 <td>The canary string is only in <code>RESULTS.md</code> and <code>QA.md</code>. Training-data filters check one document at a time, so the sample files, which hold the answers, could be collected without it</td>
-<td>Not fixed yet. Planned: add the canary as a comment to each <code>fixed.py</code> and <code>broken.py</code>, to <code>fix_syntax.py</code>, and to the task README. <code>expected.txt</code> can't hold one without becoming part of the expected output</td>
-<td>Open. Once added, the sample tests should confirm each fix still changes exactly one line</td>
+<td>Won't fix. Since a canary protects held-out value and this task has none (common syntax errors).</td>
 </tr>
 <tr valign="top">
 <td>QA-009</td><td>Shortcut (false pass, open)</td><td>Medium</td>
