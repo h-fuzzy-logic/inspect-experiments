@@ -1,24 +1,40 @@
 # inspect-experiments
 
-Hands-on experiments in building and quality-assuring LLM and agent eval tasks with the [Inspect](https://inspect.aisi.org.uk/) framework. 
+Hands-on experiments in building and quality-assuring agent eval tasks with the [Inspect](https://inspect.aisi.org.uk/) framework.
 
-The repo starts with small sandboxed tasks and will grow into a longer task, where an agent works in a Docker container to find and fix planted bugs. 
+So far, the repo has one small task, fixing Python syntax errors, with real model results. A longer, multi-hour task is next. Each task comes with:
 
-Each task ships with a tested scorer, a QA pass for misspecifications and information leaks, and a comparison of model results against a human baseline.
+- a sandboxed environment and a tested scorer
+- a QA pass for false passes, false fails, leaks, and ambiguity
+- results from real models, and a human baseline (planned)
 
-## Who builds what
+To run the tasks yourself, see [Technical Setup](#technical-setup).
 
-| Piece | Who builds it | Analogy |
+## What this repo builds
+
+An eval is like an exam. Some pieces come ready-made, and this repo builds the rest:
+
+| Piece | Built by | Exam analogy |
 |---|---|---|
 | The model | Anthropic, OpenAI, and others | The person taking the exam |
-| The agent (the scaffold, `react()`) | Inspect, ready-made | The desk, pen, and calculator they're given |
-| The task: environment, instructions, scorer | Human | The exam itself, and the answer key |
-| The QA | Human | Checking the exam is fair before anyone takes it |
-| The human baseline | Human | Taking the exam yourself to see how hard it is |
+| The agent (`react()`) | Inspect, ready-made | The desk, pen, and calculator they're given |
+| The task: environment, instructions, scorer | This repo | The exam itself, and the answer key |
+| The QA | This repo | Checking the exam is fair before anyone takes it |
+| The human baseline | This repo | Taking the exam yourself to see how hard it is |
 
-## Expected results (currently mock data)
+## Task "Fix Python Syntax" Results
 
-These charts use **mock data**. They show the results this repo is built to produce. Each one is replaced with real results as the task is built.
+[`fix_syntax`](tasks/fix_syntax/README.md) is a warm-up task: an agent gets a short Python script with one syntax error and must make it run, printing exactly the expected output, while changing at most 3 lines. 8 samples, each a different kind of error, with a ReAct agent that has `bash()`.
+
+![Every run: pass or fail for each sample and epoch](tasks/fix_syntax/figures/runs.png)
+
+- **Results:** Claude Haiku 5.5 and Claude Sonnet 5.5 both passed 24 of 24 runs (8 samples × 3 epochs), in each of three repeat evals. The task is at its ceiling, so it can't rank these models. Its value is exercising the method on something small.
+- **QA:** 11 findings, logged with how each was found, fixed, and verified. The scorer was the most common source, with 5. Four wrong fixes that still pass are tracked by strict `xfail` tests.
+- **Details:** [results](tasks/fix_syntax/RESULTS.md), [QA log and tests](tasks/fix_syntax/QA.md), and [design decisions](tasks/fix_syntax/task-decisions.md).
+
+## Mocked results for the next (longer) task
+
+This section is **mock data**. It shows the results the next task is built to produce: a longer task where an agent debugs an ETL pipeline with several planted faults. Each part will be replaced with real results as that task is built.
 
 ### Every run, nothing averaged
 | | v0 before QA | v0 after QA | v1 after QA |
@@ -36,7 +52,7 @@ These charts use **mock data**. They show the results this repo is built to prod
 | QA-003 | Shortcut | Transcript review: Model B deleted rows to match the count | Scorer checks per-day sums; agent user has no DELETE | Scorer test + rerun x3 |
 | QA-004 | Environment | Repeat runs: setup failed 1 in 10 on a race with Postgres startup | Health check before setup | 20 clean boots |
 
-Full entries: [`tasks/pipeline_debug/QA.md`](tasks/pipeline_debug/QA.md)
+Full entries will go in that task's `QA.md`.
 
 ### Scorer tests
 | Submission | Expected | Actual |
@@ -68,8 +84,6 @@ The row count matched, so the original scorer passed this run. The duplicates ca
 ![Mock: progress over time](docs/images/mock-progress-over-time.png)
 
 Models fix the independent faults faster than a human, then stall on the interacting ones. Only the human baseline fixes all four. Median of 3 runs per model.
-
-
 
 ## Technical Setup
 
