@@ -117,15 +117,44 @@ Decisions made while building the task, before any real model runs.
 | What each test asserts | The score only, or the score and the reason for it | |
 | When tests run | By hand, before each real run, or in CI | |
 
+### Solvability checks
+
+Is the task actually solvable as specified? For each check, decide whether to do it, and how.
+
+| Decision | Options to consider | Choice and reason |
+|---|---|---|
+| Reference solution | Write the intended solution and run the scorer on it. Catches a broken scorer or environment | |
+| Pre-fix failure check | Confirm every sample fails before any fix. Catches samples that are already solved, for example by a different language version | |
+| Clean-room dry run | Solve it inside the sandbox, as the agent's user, with only the agent's tools. Catches missing packages, permissions, or network access you didn't notice you used | |
+| Independent baseline | Someone other than the author solves it from the instructions alone. Catches knowledge the author has but the instructions don't give | |
+| Alternative solution | A second valid approach must also pass. Catches a scorer that accepts only your solution | |
+| Limits check | Time the reference solution against the task's limits. Catches tasks solvable in principle but not within the limits | |
+| Repeat builds | Rebuild and score the reference solution several times. Catches flaky environments, unseeded data, and timing races | |
+| Milestone checks | For long tasks: check each intermediate goal can be reached on its own. Catches tasks that break partway through | |
+
+### Spec review
+
+Are the instructions misspecified or ambiguous? For each technique, decide whether to use it, and how.
+
+| Decision | Options to consider | Choice and reason |
+|---|---|---|
+| Second reading | For each sentence of the instructions, list every plausible interpretation. Catches ambiguity, such as "correct" without saying which timezone | |
+| Spec-to-scorer traceability | Map every scorer check to a sentence of the instructions, and every sentence to a check. Catches hidden requirements (scored but never stated) and loopholes (stated but never checked) | |
+| Assumption audit | List what a human engineer would assume, such as "don't edit the source data," and check each is stated. Catches unstated rules an agent may reasonably break | |
+| Cold read | Someone else reads the instructions and restates the goal and how success is judged. Catches gaps between what you meant and what you wrote | |
+| Question probing | Write the questions a careful contractor would ask, and check the instructions answer them. Catches underspecification | |
+| Literal-compliance attack | Satisfy the instructions literally while breaking their intent. Catches specs a shortcut can satisfy, such as deleting rows to match a count | |
+| Terminology check | The same thing has the same name in the prompt, files, and code. Catches confusion from inconsistent naming | |
+| Severity rating | Rate each sample's underspecification on a scale, ideally with more than one reviewer. Catches borderline samples. SWE-bench Verified screened its samples roughly this way | |
+| Where the review is recorded | A spec file with the traceability table, the QA log, or both | |
+
 ### Build-time QA
 
 | Decision | Options to consider | Choice and reason |
 |---|---|---|
-| How much QA | A quick check, or a full pass with a written log | |
-| Spec review | Is anything ambiguous, or unstated but scored? | |
+| How much QA | A quick check, or a full pass with a written log. Which of the solvability checks and spec review techniques above to use | |
 | Red-teaming the scorer | List wrong solutions that could pass, and test each | |
 | Leak audit | Can the agent find the answer anywhere in the sandbox? | |
-| Solvability check | Run the reference solution in the real sandbox | |
 | QA log | Where findings go, and their fields: type, how found, fix, how verified | |
 | When QA is done | The point at which the task is ready for real runs | |
 
@@ -134,7 +163,7 @@ Decisions made while building the task, before any real model runs.
 | Decision | Options to consider | Choice and reason |
 |---|---|---|
 | Whether to baseline | Yes, estimate only, or not yet | |
-| Who | The author, who knows the answers, or someone new to the task | |
+| Who | The author, who knows the answers, or someone new to the task. Someone new also serves as the independent baseline under Solvability checks | |
 | How | Inspect's human agent in the same sandbox, or by hand | |
 | What's recorded | Time, pass or fail, notes on what was hard | |
 
@@ -214,6 +243,7 @@ Decisions made each time the task runs.
 | What to look for | Shortcuts, environment problems, unclear instructions, scorer mistakes | |
 | Passes to check | Whether to read some passes to catch false passes | |
 | Failure review | Classify each failure: the model's fault or the task's | |
+| Failure clustering | When several models fail the same way, check the spec before blaming the models. Catches ambiguity that only shows up in transcripts | |
 | Verdict counts | Whether the reasons for passes and fails match what you expected | |
 | Limit hits and errors | Whether they come from the model or the setup | |
 | Flakiness | Do repeat runs of the same sample disagree, and why? | |
