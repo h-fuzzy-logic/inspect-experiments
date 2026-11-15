@@ -1,13 +1,13 @@
 {
   "title": "Fixing syntax errors",
   "mock": false,
-  "generated": "2026-11-11T01:24:05+00:00",
+  "generated": "2026-11-15T19:21:54+00:00",
   "models": [
     {
       "model": "anthropic/claude-haiku-5-5",
       "task": "fix_syntax",
-      "log": "2026-11-10T13-38-46-00-00_fix-syntax_mYKDRDusH7qaoiQ7sfeiHA.eval",
-      "created": "2026-11-10T13:38:46+00:00",
+      "log": "2026-11-15T19-15-09-00-00_fix-syntax_bLve2kbmatzq2e4J72wdts.eval",
+      "created": "2026-11-15T19:15:09+00:00",
       "scorer": "script_output",
       "samples": 8,
       "epochs": 3,
@@ -16,16 +16,19 @@
       "stderr": 0.0,
       "limit_hits": 0,
       "errors": 0,
-      "mean_messages": 7.3,
-      "mean_seconds_per_run": 5.2,
-      "duration_seconds": 139.0,
+      "verdicts": {
+        "fixed": 24
+      },
+      "mean_messages": 7.2,
+      "mean_seconds_per_run": 5.3,
+      "duration_seconds": 126.0,
       "tokens": {
-        "input": 200,
-        "output": 10870,
-        "cache_write": 12690,
-        "cache_read": 66852,
-        "reasoning": 1810,
-        "total": 90612
+        "input": 198,
+        "output": 10644,
+        "cache_write": 12211,
+        "cache_read": 64833,
+        "reasoning": 1594,
+        "total": 87886
       },
       "per_sample": {
         "assign_in_condition": {
@@ -35,23 +38,26 @@
             {
               "epoch": 1,
               "score": 1.0,
+              "verdict": "fixed",
               "limit": null,
               "error": false,
-              "seconds": 5.795
+              "seconds": 4.452
             },
             {
               "epoch": 2,
               "score": 1.0,
+              "verdict": "fixed",
               "limit": null,
               "error": false,
-              "seconds": 5.827
+              "seconds": 5.23
             },
             {
               "epoch": 3,
               "score": 1.0,
+              "verdict": "fixed",
               "limit": null,
               "error": false,
-              "seconds": 5.121
+              "seconds": 5.191
             }
           ],
           "metadata": {
@@ -66,23 +72,26 @@
             {
               "epoch": 1,
               "score": 1.0,
+              "verdict": "fixed",
               "limit": null,
               "error": false,
-              "seconds": 5.506
+              "seconds": 5.859
             },
             {
               "epoch": 2,
               "score": 1.0,
+              "verdict": "fixed",
               "limit": null,
               "error": false,
-              "seconds": 5.97
+              "seconds": 5.369
             },
             {
               "epoch": 3,
               "score": 1.0,
+              "verdict": "fixed",
               "limit": null,
               "error": false,
-              "seconds": 5.966
+              "seconds": 5.426
             }
           ],
           "metadata": {
@@ -97,23 +106,26 @@
             {
               "epoch": 1,
               "score": 1.0,
+              "verdict": "fixed",
               "limit": null,
               "error": false,
-              "seconds": 3.467
+              "seconds": 3.502
             },
             {
               "epoch": 2,
               "score": 1.0,
+              "verdict": "fixed",
               "limit": null,
               "error": false,
-              "seconds": 4.185
+              "seconds": 4.433
             },
             {
               "epoch": 3,
               "score": 1.0,
+              "verdict": "fixed",
               "limit": null,
               "error": false,
-              "seconds": 3.997
+              "seconds": 4.339
             }
           ],
           "metadata": {
@@ -128,23 +140,26 @@
             {
               "epoch": 1,
               "score": 1.0,
+              "verdict": "fixed",
               "limit": null,
               "error": false,
-              "seconds": 5.019
+              "seconds": 5.284
             },
             {
               "epoch": 2,
               "score": 1.0,
+              "verdict": "fixed",
               "limit": null,
               "error": false,
-              "seconds": 4.437
+              "seconds": 5.281
             },
             {
               "epoch": 3,
               "score": 1.0,
+              "verdict": "fixed",
               "limit": null,
               "error": false,
-              "seconds": 4.324
+              "seconds": 5.791
             }
           ],
           "metadata": {
@@ -159,23 +174,26 @@
             {
               "epoch": 1,
               "score": 1.0,
+              "verdict": "fixed",
               "limit": null,
               "error": false,
-              "seconds": 5.037
+              "seconds": 6.104
             },
             {
               "epoch": 2,
               "score": 1.0,
+              "verdict": "fixed",
               "limit": null,
               "error": false,
-              "seconds": 4.031
+              "seconds": 3.981
             },
             {
               "epoch": 3,
               "score": 1.0,
+              "verdict": "fixed",
               "limit": null,
               "error": false,
-              "seconds": 4.237
+              "seconds": 4.057
             }
           ],
           "metadata": {
@@ -190,23 +208,26 @@
             {
               "epoch": 1,
               "score": 1.0,
+              "verdict": "fixed",
               "limit": null,
               "error": false,
-              "seconds": 8.089
+              "seconds": 6.983
             },
             {
               "epoch": 2,
               "score": 1.0,
+              "verdict": "fixed",
               "limit": null,
               "error": false,
-              "seconds": 9.711
+              "seconds": 6.687
             },
             {
               "epoch": 3,
               "score": 1.0,
+              "verdict": "fixed",
               "limit": null,
               "error": false,
-              "seconds": 6.818
+              "seconds": 5.872
             }
           ],
           "metadata": {
@@ -221,23 +242,26 @@
             {
               "epoch": 1,
               "score": 1.0,
+              "verdict": "fixed",
               "limit": null,
               "error": false,
-              "seconds": 4.203
+              "seconds": 7.889
             },
             {
               "epoch": 2,
               "score": 1.0,
+              "verdict": "fixed",
               "limit": null,
               "error": false,
-              "seconds": 4.32
+              "seconds": 5.348
             },
             {
               "epoch": 3,
               "score": 1.0,
+              "verdict": "fixed",
               "limit": null,
               "error": false,
-              "seconds": 4.436
+              "seconds": 5.167
             }
           ],
           "metadata": {
@@ -252,23 +276,26 @@
             {
               "epoch": 1,
               "score": 1.0,
+              "verdict": "fixed",
               "limit": null,
               "error": false,
-              "seconds": 6.599
+              "seconds": 5.551
             },
             {
               "epoch": 2,
               "score": 1.0,
+              "verdict": "fixed",
               "limit": null,
               "error": false,
-              "seconds": 3.831
+              "seconds": 5.287
             },
             {
               "epoch": 3,
               "score": 1.0,
+              "verdict": "fixed",
               "limit": null,
               "error": false,
-              "seconds": 4.31
+              "seconds": 5.176
             }
           ],
           "metadata": {
@@ -281,8 +308,8 @@
     {
       "model": "anthropic/claude-sonnet-5-5",
       "task": "fix_syntax",
-      "log": "2026-11-11T01-14-16-00-00_fix-syntax_BGDPt6oYueHmij9uYGCwz2.eval",
-      "created": "2026-11-11T01:14:16+00:00",
+      "log": "2026-11-15T19-17-40-00-00_fix-syntax_7HQgBRNJATMcoADtAAN2e3.eval",
+      "created": "2026-11-15T19:17:40+00:00",
       "scorer": "script_output",
       "samples": 8,
       "epochs": 3,
@@ -291,16 +318,19 @@
       "stderr": 0.0,
       "limit_hits": 0,
       "errors": 0,
+      "verdicts": {
+        "fixed": 24
+      },
       "mean_messages": 7,
-      "mean_seconds_per_run": 7.1,
-      "duration_seconds": 162.0,
+      "mean_seconds_per_run": 8.2,
+      "duration_seconds": 168.0,
       "tokens": {
         "input": 192,
-        "output": 6381,
-        "cache_write": 6289,
-        "cache_read": 61484,
-        "reasoning": 201,
-        "total": 74346
+        "output": 6474,
+        "cache_write": 5379,
+        "cache_read": 62484,
+        "reasoning": 285,
+        "total": 74529
       },
       "per_sample": {
         "assign_in_condition": {
@@ -310,23 +340,26 @@
             {
               "epoch": 1,
               "score": 1.0,
+              "verdict": "fixed",
               "limit": null,
               "error": false,
-              "seconds": 8.523
+              "seconds": 10.233
             },
             {
               "epoch": 2,
               "score": 1.0,
+              "verdict": "fixed",
               "limit": null,
               "error": false,
-              "seconds": 6.501
+              "seconds": 9.061
             },
             {
               "epoch": 3,
               "score": 1.0,
+              "verdict": "fixed",
               "limit": null,
               "error": false,
-              "seconds": 6.138
+              "seconds": 5.872
             }
           ],
           "metadata": {
@@ -341,23 +374,26 @@
             {
               "epoch": 1,
               "score": 1.0,
+              "verdict": "fixed",
               "limit": null,
               "error": false,
-              "seconds": 6.496
+              "seconds": 6.935
             },
             {
               "epoch": 2,
               "score": 1.0,
+              "verdict": "fixed",
               "limit": null,
               "error": false,
-              "seconds": 10.766
+              "seconds": 8.861
             },
             {
               "epoch": 3,
               "score": 1.0,
+              "verdict": "fixed",
               "limit": null,
               "error": false,
-              "seconds": 9.438
+              "seconds": 8.416
             }
           ],
           "metadata": {
@@ -372,23 +408,26 @@
             {
               "epoch": 1,
               "score": 1.0,
+              "verdict": "fixed",
               "limit": null,
               "error": false,
-              "seconds": 5.097
+              "seconds": 15.27
             },
             {
               "epoch": 2,
               "score": 1.0,
+              "verdict": "fixed",
               "limit": null,
               "error": false,
-              "seconds": 4.846
+              "seconds": 6.456
             },
             {
               "epoch": 3,
               "score": 1.0,
+              "verdict": "fixed",
               "limit": null,
               "error": false,
-              "seconds": 5.218
+              "seconds": 7.932
             }
           ],
           "metadata": {
@@ -403,23 +442,26 @@
             {
               "epoch": 1,
               "score": 1.0,
+              "verdict": "fixed",
               "limit": null,
               "error": false,
-              "seconds": 6.863
+              "seconds": 6.051
             },
             {
               "epoch": 2,
               "score": 1.0,
+              "verdict": "fixed",
               "limit": null,
               "error": false,
-              "seconds": 5.77
+              "seconds": 7.476
             },
             {
               "epoch": 3,
               "score": 1.0,
+              "verdict": "fixed",
               "limit": null,
               "error": false,
-              "seconds": 7.2
+              "seconds": 5.93
             }
           ],
           "metadata": {
@@ -434,23 +476,26 @@
             {
               "epoch": 1,
               "score": 1.0,
+              "verdict": "fixed",
               "limit": null,
               "error": false,
-              "seconds": 7.324
+              "seconds": 5.631
             },
             {
               "epoch": 2,
               "score": 1.0,
+              "verdict": "fixed",
               "limit": null,
               "error": false,
-              "seconds": 5.669
+              "seconds": 9.209
             },
             {
               "epoch": 3,
               "score": 1.0,
+              "verdict": "fixed",
               "limit": null,
               "error": false,
-              "seconds": 7.962
+              "seconds": 9.456
             }
           ],
           "metadata": {
@@ -465,23 +510,26 @@
             {
               "epoch": 1,
               "score": 1.0,
+              "verdict": "fixed",
               "limit": null,
               "error": false,
-              "seconds": 4.815
+              "seconds": 8.998
             },
             {
               "epoch": 2,
               "score": 1.0,
+              "verdict": "fixed",
               "limit": null,
               "error": false,
-              "seconds": 4.557
+              "seconds": 9.531
             },
             {
               "epoch": 3,
               "score": 1.0,
+              "verdict": "fixed",
               "limit": null,
               "error": false,
-              "seconds": 5.191
+              "seconds": 6.505
             }
           ],
           "metadata": {
@@ -496,23 +544,26 @@
             {
               "epoch": 1,
               "score": 1.0,
+              "verdict": "fixed",
               "limit": null,
               "error": false,
-              "seconds": 7.399
+              "seconds": 12.777
             },
             {
               "epoch": 2,
               "score": 1.0,
+              "verdict": "fixed",
               "limit": null,
               "error": false,
-              "seconds": 8.539
+              "seconds": 6.966
             },
             {
               "epoch": 3,
               "score": 1.0,
+              "verdict": "fixed",
               "limit": null,
               "error": false,
-              "seconds": 9.409
+              "seconds": 5.875
             }
           ],
           "metadata": {
@@ -527,23 +578,26 @@
             {
               "epoch": 1,
               "score": 1.0,
+              "verdict": "fixed",
               "limit": null,
               "error": false,
-              "seconds": 6.744
+              "seconds": 6.43
             },
             {
               "epoch": 2,
               "score": 1.0,
+              "verdict": "fixed",
               "limit": null,
               "error": false,
-              "seconds": 14.293
+              "seconds": 7.819
             },
             {
               "epoch": 3,
               "score": 1.0,
+              "verdict": "fixed",
               "limit": null,
               "error": false,
-              "seconds": 6.443
+              "seconds": 7.982
             }
           ],
           "metadata": {

@@ -74,7 +74,7 @@ The answer key (`expected.txt`) and the reference fix (`fixed.py`) never enter t
 
 ## Results
 
-Claude Haiku 5.5 (run 2026-11-10) and Claude Sonnet 5.5 (run 2026-11-11), 8 samples × 3 epochs each, on the same task commit.
+Claude Haiku 5.5 and Claude Sonnet 5.5, both run 2026-11-15 on task commit `042690b`, 8 samples × 3 epochs each. This is each model's third full eval, and the first with verdicts recorded. The two earlier pairs also scored 24 of 24 for both models (see [Repeat evals](#repeat-evals)).
 
 ![Pass rate by model, with 95% confidence intervals](figures/models.png)
 
@@ -86,21 +86,38 @@ Claude Haiku 5.5 (run 2026-11-10) and Claude Sonnet 5.5 (run 2026-11-11), 8 samp
 | Accuracy (± stderr) | 1.000 ± 0.000 | 1.000 ± 0.000 |
 | Samples passed in all 3 epochs | 8 of 8 | 8 of 8 |
 | Runs ending at a limit | 0 | 0 |
-| Verdicts | 24 not recorded | 24 not recorded |
-| Mean messages per run | 7.3 | 7.0 |
-| Mean seconds per run | 5.2 | 7.1 |
-| Tokens, whole eval (24 runs) | 90,612 | 74,346 |
-| Tokens per run, approx. (one sample, one epoch) | 3,800 | 3,100 |
-| Output tokens, whole eval | 10,870 | 6,381 |
-| Reasoning tokens, whole eval (part of output) | 1,810 | 201 |
+| Verdicts | 24 `fixed` | 24 `fixed` |
+| Mean messages per run | 7.25 | 7.0 |
+| Mean seconds per run | 5.3 | 8.2 |
+| Tokens, whole eval (24 runs) | 87,886 | 74,529 |
+| Tokens per run, approx. (one sample, one epoch) | 3,700 | 3,100 |
+| Output tokens, whole eval | 10,644 | 6,474 |
+| Reasoning tokens, whole eval (part of output) | 1,594 | 285 |
 
 Most input tokens in both runs were cache reads.
 
-**Verdicts** count the scorer's reason for each run's pass or fail, such as `fixed`, `rewritten`, or `still_broken` (see the [task README](README.md#how-its-scored)). These runs were scored before the scorer recorded verdicts, so they show as not recorded. Since every run passed, all 24 would be `fixed`. The next runs will record them, and the counts will show why runs fail, including whether a model ever tries a shortcut such as `rewritten`.
+**Verdicts** count the scorer's reason for each run's pass or fail, such as `fixed`, `rewritten`, or `still_broken` (see the [task README](README.md#how-its-scored)). Every run here was `fixed`, each with 1 line changed, so neither model tried a shortcut the scorer catches, such as `rewritten`. On a harder task, the counts will show why runs fail. The two earlier pairs ran on commit `4769304`, from before the scorer recorded verdicts.
 
-**Reading it:** both models fixed every error in every epoch. That confirms the task, scorer, and pipeline work end to end, but a ceiling score can't rank models. The stderr of 0 means there was no variation to measure, not that the estimate is exact. The task needs harder samples to separate models (see [Limitations](#limitations)).
+**Reading it:** both models fixed every error in every epoch, in all three evals. That confirms the task, scorer, and pipeline work end to end, but a ceiling score can't rank models. The stderr of 0 means there was no variation to measure, not that the estimate is exact. The task needs harder samples to separate models (see [Limitations](#limitations)).
 
-The only differences are in how they worked. Sonnet used about 18% fewer tokens and about 40% fewer output tokens, with far less reasoning, but took about 2 seconds longer per run. With one eval of each model, that describes these two evals, not a measured difference between the models.
+The only differences are in how they worked.
+
+### Repeat evals
+
+Each model was evaluated three times. Pass counts never changed, but token use did:
+
+| Eval | Commit | Passed (Haiku / Sonnet) | Seconds per run | Total tokens | Output tokens | Reasoning tokens |
+|---|---|---|---|---|---|---|
+| 1: 2026-11-10 / 11-11 | `4769304` | 24 / 24 | 5.2 / 7.1 | 90,612 / 74,346 | 10,870 / 6,381 | 1,810 / 201 |
+| 2: 2026-11-15 | `4769304` | 24 / 24 | 4.8 / 7.1 | 80,839 / 74,339 | 9,423 / 6,334 | 947 / 237 |
+| 3: 2026-11-15 | `042690b` | 24 / 24 | 5.3 / 8.2 | 87,886 / 74,529 | 10,644 / 6,474 | 1,594 / 285 |
+
+Values are Haiku / Sonnet. Between the two commits, the scorer gained verdicts and split its failure reasons, but the rule for a pass didn't change, so all three evals are scored the same way.
+
+- **Same direction in all three evals:** Sonnet took 2 to 3 seconds longer per run, wrote 33% to 41% fewer output tokens, and used less reasoning.
+- **Varied:** Sonnet's saving in total tokens ranged from 8% to 18%, mostly because Haiku's own use ranged from 80,839 to 90,612. Haiku's reasoning tokens ranged from 947 to 1,810.
+
+Three evals per model is still few, so these describe how the two models behaved on this task, not a measured difference between them. The repeats mostly show how much a single eval's token count can move.
 
 The per-sample grid is in [figures/samples.png](figures/samples.png).
 
@@ -150,12 +167,12 @@ uv run python $V/make_qa_chart.py $R/mock-qa-rounds.json --short-names -o $F/moc
 
 | Item | Value |
 |---|---|
-| Task commit | `4769304` (both runs) |
+| Task commit | `042690b` (eval 3). Evals 1 and 2: `4769304` |
 | Scorer version | 2: output check + at most 3 lines changed |
 | inspect_ai | 0.3.286 |
 | Sandbox image | `python:3.12-slim`, not yet pinned by digest |
 | Models | `anthropic/claude-haiku-5-5` and `anthropic/claude-sonnet-5-5`, default settings |
-| Run dates | 2026-11-10 (Haiku), 2026-11-11 (Sonnet) |
+| Run dates | 2026-11-15 (eval 3, both models). See [Repeat evals](#repeat-evals) for earlier evals |
 
 Logs stay local (`logs/` is git-ignored). Per-model results are in [`results/results.json`](results/results.json).
 

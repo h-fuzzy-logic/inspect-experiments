@@ -91,6 +91,40 @@ uv run inspect eval tasks/fix_syntax/fix_syntax.py -T solution=none --model mock
 
 If `reference` scores 1 and `none` scores 0, the scorer can tell fixed scripts from broken ones.
 
+## What the agent sees
+
+The agent gets two messages: a system message from Inspect's `react()` agent, and the task's instructions.
+
+**System message.** This is `react()`'s **default prompt**. The task doesn't set or change it:
+
+```text
+You are a helpful assistant attempting to submit the best possible answer. You have several tools available to help with finding the answer. You will see the result of tool calls right after sending the message. Prioritize parallel tool calls: when operations are independent, run them in one response — e.g. reading several files or running several searches at once — rather than one at a time. Only sequence calls when one depends on another's result. Do some reasoning before your actions, describing what tool calls you are going to use and how they fit into your plan.
+
+When you have completed the task and have an answer, call the submit() tool to report it.
+```
+
+**Instructions**, from `PROMPT` in `fix_syntax.py`. The script path changes per sample:
+
+```text
+The Python script /workspace/report.py fails with a syntax error.
+Fix the error so that `python3 /workspace/report.py` runs successfully.
+Change as little as possible, and don't change what the script prints.
+When you're done, submit.
+```
+
+The default prompt has three parts, set by `react()`'s `prompt` argument (an `AgentPrompt`):
+
+| Part | Default | Sent in this task? |
+|---|---|---|
+| `instructions` | Empty | No |
+| `handoff_prompt` | A paragraph about multi-agent systems and `transfer_to_<agent_name>` handoffs | No. It's only added when the agent has handoff tools, and this one doesn't |
+| `assistant_prompt` | "You are a helpful assistant…" | Yes |
+| `submit_prompt` | "…call the {submit}() tool to report it." | Yes, with `{submit}` replaced by `submit` |
+
+The eval log records all four parts in the solver's settings, including the handoff paragraph. The system message in each sample's transcript is what the model actually received.
+
+To change the prompt, pass `prompt=AgentPrompt(...)` to `react()`. Setting a part to `None` leaves it out. Results from a changed prompt aren't comparable with runs using the default, so record the change with the results.
+
 ## How it's scored
 
 The `script_output()` scorer checks two things after the agent finishes. The result is `C` (correct) only if both pass:
