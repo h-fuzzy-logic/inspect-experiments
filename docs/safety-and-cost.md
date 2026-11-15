@@ -7,7 +7,7 @@ The precautions this repo follows when running evals, and how it keeps costs dow
 ### Where models run
 
 - **No real model calls on a laptop.** Local runs use only `--model mockllm/model`, which makes no network calls and needs no key.
-- **Real model runs happen only in the cloud,** which for now means a GitHub Codespace. A codespace is a separate VM, so an agent run never touches your own machine. See [GitHub Codespaces](github-codespace.md).
+- **Real model runs happen only in the cloud,** which for now means a GitHub Codespace. A Codespace is a separate VM, so an agent run never touches your own machine. See [GitHub Codespaces](github-codespaces.md).
 - **No API keys in the repo or on your laptop.** Keys are stored only as Codespaces secrets, such as `GOOGLE_API_KEY`, limited to this repo. This is the guarantee that matters most: without a key, a local model call fails, whoever starts it. See [API keys](../README.md#api-keys).
 - **The same rules are written for Claude Code** in [CLAUDE.md](../CLAUDE.md), so it runs only the mock model locally and never writes a key to a file.
 
@@ -50,8 +50,8 @@ The precautions this repo follows when running evals, and how it keeps costs dow
 
 ### Keep cloud costs at zero
 
-- **Use the Codespaces free tier.** Personal accounts get a monthly allowance of core-hours and storage. A 2-core machine is enough for these tasks. Check GitHub's billing docs for current limits. See [Cost](github-codespace.md#cost).
-- **Stop or delete codespaces when you're done.** A stopped codespace still uses storage, and a deleted one uses nothing.
+- **Use the Codespaces free tier.** Personal accounts get a monthly allowance of core-hours and storage. A 2-core machine is enough for these tasks. Check GitHub's billing docs for current limits. See [Cost](github-codespaces.md#cost).
+- **Stop or delete Codespaces when you're done.** A stopped Codespace still uses storage, and a deleted one uses nothing.
 
 ### Gaps
 

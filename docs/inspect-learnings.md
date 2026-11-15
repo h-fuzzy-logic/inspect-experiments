@@ -99,7 +99,7 @@ Things that trip you up:
 
 ## Running in GitHub Codespaces
 
-Moved to [github-codespace.md](github-codespace.md): the dev container, setup, running evals with tmux, viewing logs, long runs, cost, and troubleshooting.
+Moved to [github-codespaces.md](github-codespaces.md): the dev container, setup, running evals with tmux, viewing logs, long runs, cost, and troubleshooting.
 
 Compared with EC2, Codespaces is easier to set up and use. EC2 gives you control over the network and has no idle timeout, so it's better for runs longer than about 4 hours.
 

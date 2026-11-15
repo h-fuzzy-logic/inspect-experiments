@@ -79,8 +79,10 @@ Inspect can run on your machine in a Python `.venv`, calls the model through the
 
 - [Evaluation Architecture](docs/eval-architecture.md): what the agent is made of, where each part runs, and how the agent works in its sandbox.
 - [Agent tool calls in the sandbox](docs/agent-sandbox-sequence.md): one turn of the agent loop, step by step.
+- [Engineering practices](docs/engineering-practices.md): the software engineering techniques this repo demonstrates, with links to each.
+- [Task decisions template](docs/task-decisions-template.md): the choices to make when designing and running a task, as a blank template.
 - [Safety and cost](docs/safety-and-cost.md): the security precautions this repo follows, and how it keeps costs down.
-- [GitHub Codespaces](docs/github-codespace.md): how to set up a codespace and run evals with real models there.
+- [GitHub Codespaces](docs/github-codespaces.md): how to set up a Codespace and run evals with real models there.
 - [Inspect learnings](docs/inspect-learnings.md): notes on design choices, security, and running in AWS.
 
 ### If you want to run Inspect locally
@@ -121,21 +123,7 @@ The `hello` task doesn't use a sandbox, so step 5 tests Inspect but not Docker. 
 
 #### API keys
 
-Local runs use only the mock model (`--model mockllm/model`), which needs no key. Real model runs happen only in the cloud, which for now means a GitHub Codespace. No API keys are kept in this repo or on your machine. For the full codespace setup, see [GitHub Codespaces](docs/github-codespace.md).
-
-To give a codespace a key:
-
-1. On GitHub, go to **Settings → Codespaces → Secrets → New secret**.
-2. Name it for the provider, such as `GOOGLE_API_KEY` for Gemini or `ANTHROPIC_API_KEY` for Claude, and limit its access to this repo.
-3. Restart the codespace. GitHub sets the secret as an environment variable, and Inspect reads it from there.
-
-Then, in the codespace, run a task with a real model:
-
-```sh
-uv run inspect eval tasks/fix_syntax/fix_syntax.py --model google/gemini-3.6-flash
-```
-
-Check the provider's current model list for the exact name.
+Local runs use only the mock model (`--model mockllm/model`), which needs no key. Real model runs happen only in the cloud, which for now means a GitHub Codespace. No API keys are kept in this repo or on your machine. To set up a Codespace, add keys, and run evals with real models, see [GitHub Codespaces](docs/github-codespaces.md).
 
 ## Running
 

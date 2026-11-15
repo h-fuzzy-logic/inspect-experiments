@@ -184,7 +184,7 @@ Decisions made each time the task runs.
 
 | Decision | Options to consider | Choice and reason |
 |---|---|---|
-| Location | Local machine, a codespace, or other cloud resources | |
+| Location | Local machine, a Codespace, or other cloud resources | |
 | What runs where | Mock-model and reference runs locally; real models in the cloud | |
 | API keys | Where they're stored, and who can use them | |
 | Code version | How the run machine gets the right commit, and how you check it | |

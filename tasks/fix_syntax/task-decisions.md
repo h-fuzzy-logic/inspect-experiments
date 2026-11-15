@@ -184,10 +184,10 @@ For the details behind these choices, see [README.md](README.md), [RESULTS.md](R
 
 | Decision | Options to consider | Choice and reason |
 |---|---|---|
-| Location | Local machine, a codespace, or other cloud resources | A GitHub Codespace for real models |
-| What runs where | Mock and reference runs locally; real models in the cloud | Locally, only `mockllm/model` and the test solvers. Real models only in the codespace |
+| Location | Local machine, a Codespace, or other cloud resources | A GitHub Codespace for real models |
+| What runs where | Mock and reference runs locally; real models in the cloud | Locally, only `mockllm/model` and the test solvers. Real models only in the Codespace |
 | API keys | Where they're stored, and who can use them | Codespaces secrets only, limited to this repo. Never in a file |
-| Code version | How the run machine gets the right commit | Push from the Mac, `git pull` in the codespace, check with `git log -1`. Each log records its commit |
+| Code version | How the run machine gets the right commit | Push from the Mac, `git pull` in the Codespace, check with `git log -1`. Each log records its commit |
 
 ### Models
 
@@ -231,7 +231,7 @@ For the details behind these choices, see [README.md](README.md), [RESULTS.md](R
 | Decision | Options to consider | Choice and reason |
 |---|---|---|
 | Checks | Tests pass, reference scores 1, do-nothing scores 0 | `uv run pytest tasks/fix_syntax/tests` covers all three |
-| Code check | Expected commit, no uncommitted changes | `git pull` and `git log -1` in the codespace |
+| Code check | Expected commit, no uncommitted changes | `git pull` and `git log -1` in the Codespace |
 | Environment check | Docker running, disk, keys set | `scripts/check_model.sh` checks the API key works with one prompt |
 | Run record | Where the command, commit, date, and reason are noted | The Reproduce section of [RESULTS.md](RESULTS.md#reproduce), and the eval logs themselves |
 

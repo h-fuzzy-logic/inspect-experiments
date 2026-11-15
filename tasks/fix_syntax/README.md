@@ -67,15 +67,9 @@ These errors are easy, so most models will probably score near 1.0. A task that 
 
 ## Run it
 
-**With a model.** Run this in a codespace only, with the provider's API key set as a Codespaces secret. See [GitHub Codespaces](../../docs/github-codespace.md). Each run costs a little:
+**With a model.** Real model runs happen only in a Codespace. For setup and the commands to run this task with a model, see [Run an eval](../../docs/github-codespaces.md#run-an-eval).
 
-```sh
-uv run inspect eval tasks/fix_syntax/fix_syntax.py --model google/gemini-3.6-flash
-```
-
-The agent is Inspect's `react()` agent with one tool, `bash()`. It runs commands in the sandbox, then submits. Each sample gets its own sandbox. On a free tier, add `--max-connections 1` so the samples don't hit the rate limit all at once.
-
-To run a few samples first, add `--limit 2`. To run one sample, add `--sample-id missing_comma`.
+The agent is Inspect's `react()` agent with one tool, `bash()`. It runs commands in the sandbox, then submits. Each sample gets its own sandbox.
 
 **Without a model, to test the scorer.** The `solution` option swaps the agent for a fixed solver:
 

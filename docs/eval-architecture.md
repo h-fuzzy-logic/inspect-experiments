@@ -70,7 +70,7 @@ classDiagram
 
 The object diagram shows the classes coming to life in this repo. The classes describe what any evaluation framework, agent, and model are. The objects are what exists when you run `inspect eval`: Inspect reads the task, builds the agent with this repo's prompt and tools, connects to the model you chose, and starts a sandbox. The objects live only for the run. When it ends, they're gone, and the log is what remains.
 
-The same objects come to life wherever the eval runs, whether on your personal machine, an EC2 instance, or a codespace. The environment changes where each object runs, which the Deployment section shows, but not what the objects are.
+The same objects come to life wherever the eval runs, whether on your personal machine, an EC2 instance, or a Codespace. The environment changes where each object runs, which the Deployment section shows, but not what the objects are.
 
 Classes are on the left and their objects are on the right, so each row reads from class to object. A dashed «instance of» arrow points from each object to its class, and the object's label, such as «Agent», names that class too.
 
@@ -205,7 +205,7 @@ The diagram below shows the same thing as a deployment diagram, using UML deploy
 
 ```mermaid
 flowchart TB
-    subgraph host["«device» Your laptop, EC2 instance, or codespace"]
+    subgraph host["«device» Your laptop, EC2 instance, or Codespace"]
         subgraph venv["«execution environment» Python .venv"]
             subgraph proc["Inspect process"]
                 scaffold["Agent scaffold<br/>system prompt, loop, context handling,<br/>stop rules, generation config, tool definitions"]

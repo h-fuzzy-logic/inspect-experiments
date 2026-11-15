@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Check that a Gemini model answers, and how long it takes.
-# Runs in a codespace only. Reads the key from $GOOGLE_API_KEY and never prints it.
-# See docs/github-codespace.md.
+# Runs in a Codespace only. Reads the key from $GOOGLE_API_KEY and never prints it.
+# See docs/github-codespaces.md.
 #
 # Usage:
 #   scripts/check_model.sh list               # list available Gemini models (free)
@@ -9,11 +9,11 @@
 set -u
 
 if [ "${CODESPACES:-}" != "true" ]; then
-  echo "Run this in a codespace, not locally. See CLAUDE.md." >&2
+  echo "Run this in a Codespace, not locally. See CLAUDE.md." >&2
   exit 1
 fi
 if [ -z "${GOOGLE_API_KEY:-}" ]; then
-  echo "GOOGLE_API_KEY is not set. Add it as a Codespaces secret, then restart the codespace." >&2
+  echo "GOOGLE_API_KEY is not set. Add it as a Codespaces secret, then restart the Codespace." >&2
   exit 1
 fi
 

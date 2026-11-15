@@ -136,15 +136,15 @@ QA checks that a score reflects the model, not a flaw in the task. Eleven findin
 
 **The human times in this chart are mock.** The model times are real, from the Haiku and Sonnet runs.
 
-- **Plan:** solve all 8 samples with Inspect's human agent, in the same sandbox with the same tools, timed by the task clock. Do it well after writing the samples, in shuffled order.
-- **Bias:** the baseliner is the task author, who wrote the bugs, so the times are a lower bound.
+- **Plan:** solve all 8 samples with Inspect's human agent, in the same sandbox with the same tools, timed by the task clock. Do it well after last reviewing the samples, in shuffled order.
+- **Bias:** the baseliner is the task author. An AI coding assistant wrote the samples, but the author has seen them and their fixes, so the times are a lower bound.
 - **Model time isn't comparable to human time.** It includes API latency and reflects a different way of working. It's useful for checking that limits are generous, not as a capability measure.
 
 Replace `results/mock-human-baseline.json` with real timings, rename it without `mock-`, and set `"mock": false`.
 
 ## Reproduce
 
-From the repo root, in a codespace (see [GitHub Codespaces](../../docs/github-codespace.md)):
+From the repo root, in a Codespace (see [GitHub Codespaces](../../docs/github-codespaces.md)):
 
 ```sh
 uv run inspect eval tasks/fix_syntax/fix_syntax.py --model anthropic/claude-haiku-5-5 --epochs 3 --max-connections 2 --time-limit 600 --attempt-timeout 180
