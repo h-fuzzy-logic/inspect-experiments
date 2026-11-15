@@ -23,7 +23,7 @@ The whole evaluation system: the framework, the agent inside a task, and the mod
 │ │ Scorer     checks the agent's result                 │ │
 │ └──────────────────────────────────────────────────────┘ │
 │                                                          │
-│ ┌────────────── Sandbox (one per sample) ──────────────┐ │
+│ ┌──────────────── Sandbox (one per run) ───────────────┐ │
 │ │ ETL code, data, and tests                            │ │
 │ └──────────────────────────────────────────────────────┘ │
 └──────────────────────────────────────────────────────────┘
@@ -249,10 +249,12 @@ The class diagram and the deployment don't line up exactly:
 ## Container lifecycle
 
 1. **Build.** On the first run, Inspect builds the image with `docker compose` from the task's Dockerfile, or pulls its default image if the task has no Docker files. See [How Inspect picks the sandbox image](#how-inspect-picks-the-sandbox-image). Later runs reuse the image until the Dockerfile changes.
-2. **Start.** Inspect starts a fresh container for each sample, so one sample's changes never carry over to the next.
+2. **Start.** Inspect starts a fresh container for each run: each sample in each epoch. A run's changes never carry over to the next, even to another epoch of the same sample, so each epoch starts from the sample's original files. A full `fix_syntax` eval, 8 samples × 3 epochs, creates 24 containers. Only a few run at once, set by `--max-connections` and `--max-sandboxes`.
+
+   That's one container per run for a single-service task like `fix_syntax`. A task whose compose file defines several services, such as an agent container and a database, starts one container per service for each run.
 3. **Run.** The agent's tool calls run in the container until the agent submits or hits a limit.
 4. **Score.** The scorer runs on the host. It can still run commands in the container, such as the test suite, before cleanup.
-5. **Clean up.** Inspect removes the container. To keep it for debugging, run with `--no-sandbox-cleanup`.
+5. **Clean up.** Inspect removes the container, and with it the run's final files. The log keeps the transcript and score, but not the files, so a scorer that reads files from the sandbox, like `fix_syntax`'s, can't re-score a finished run. To keep the container for debugging, run with `--no-sandbox-cleanup`.
 
 ## How tool calls reach the container
 

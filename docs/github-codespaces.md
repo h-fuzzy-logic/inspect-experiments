@@ -142,7 +142,7 @@ Inside the Codespace, Inspect uses Docker to build images and start containers. 
 
 - **One image per task.** For `fix_syntax`, Docker pulls `python:3.12-slim`, then builds the task's image from its `Dockerfile`. This happens on the first run only. Later runs reuse the image until the Dockerfile changes. `hello_docker` has no Dockerfile, so it pulls Inspect's default image, `aisiuk/inspect-tool-support`, instead.
 - **A new Codespace starts with no images,** so its first run pulls and builds again. That's why the first run in a new Codespace is slow.
-- **One container per sample.** Each sample, and each epoch of it, gets a fresh container from the task's image, which Inspect removes when the sample finishes. A full `fix_syntax` eval with 3 epochs starts 24 containers.
+- **One container per run.** Each sample, and each epoch of it, gets a fresh container from the task's image, which Inspect removes when the sample finishes. A full `fix_syntax` eval with 3 epochs starts 24 containers. See [Container lifecycle](eval-architecture.md#container-lifecycle).
 - **How many run at once.** Two limits apply, and the lower one wins:
   - Inspect runs as many samples at once as `--max-connections` allows. With `--max-connections 2`, that's two samples, and two containers, at a time.
   - Inspect caps Docker sandboxes at twice the machine's CPU count. On a 2-core Codespace, that's 4 containers at once.

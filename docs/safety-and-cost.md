@@ -16,7 +16,7 @@ The precautions this repo follows when running evals, and how it keeps costs dow
 - **No network.** Inspect writes the sandbox's compose file with `network_mode: none`, so the agent can't download anything or send data out. See [How Inspect picks the sandbox image](eval-architecture.md#how-inspect-picks-the-sandbox-image).
 - **No host files.** Nothing from the host is mounted into the sandbox. The agent only sees what the Dockerfile copies in.
 - **No keys.** The model is called by Inspect outside the sandbox, so keys never enter the container.
-- **A fresh container for each sample,** removed afterward, so one run can't affect the next.
+- **A fresh container for each run,** meaning each sample in each epoch, removed afterward, so one run can't affect the next. See [Container lifecycle](eval-architecture.md#container-lifecycle).
 - **A non-root user.** `fix_syntax` runs as an `agent` user that owns only `/workspace`. `hello_docker` uses Inspect's default image, which runs as root. That's acceptable for an `echo` check, but not for agent tasks.
 
 ### Keeping the answers out of reach
