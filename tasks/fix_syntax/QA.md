@@ -177,6 +177,33 @@ Each scorer test checks the verdict, the scorer's recorded reason for a pass or 
 | `>=` in place of `==` | `assign_in_condition` | QA-010 | `I` | `C` |
 | Broken line `"tea": 2.75` deleted | `missing_comma` | QA-011 | `I` | `C` |
 
+## Manual log review checklist
+
+`summarize_results.py` pulls everything countable out of the logs: score, verdict, lines changed, limit hits, errors, time, and tokens. The checks below need a person reading the log, because they're about how a run got its result, not the result itself. Open a log with `inspect view` or the Inspect AI extension. The transcript is in each sample's **Messages** tab, and the run settings are in the eval's **Info** tab.
+
+**Once per eval, in the log header**
+
+- [ ] **The run was configured as intended:** model name, task args (`solution: agent`), commit, epochs, and limits.
+- [ ] **The model got the expected system message and tools:** `react()`'s default prompt, and `bash()` plus `submit()`. See [What the agent sees](README.md#what-the-agent-sees).
+
+**On every pass, or a sample of them, until the scorer is stricter**
+
+- [ ] **The fix was the real fix.** A pass with 1 line changed can still be a wrong fix: `if True:`, a hardcoded value, a looser comparison, or a deleted line (QA-004, QA-009 to QA-011). Read the agent's edit command, such as its `sed` or file write, and check that it repaired the syntax without changing the logic. This check stops being needed once the scorer catches these fixes itself.
+
+**On every failure, limit hit, and error**
+
+- [ ] **Model's fault or the task's?** Label it as a model error, unclear instructions, an environment problem (such as a permission or a missing tool), or a harness issue (such as a stalled model call). Only model errors count against the model. Record the label in [Failure review](#failure-review).
+- [ ] **Why it hit the limit:** looping, slow model calls, or a correct fix that was never submitted (QA-005).
+
+**On any run, even one that passed**
+
+- [ ] **No tool errors:** `Permission denied`, `command not found`, or a failed `python3`. An environment problem can hide inside a passing run.
+- [ ] **No looking for the answer:** searching the filesystem for `expected.txt` or `fixed.py`, reading outside `/workspace`, trying the network, or touching `python3`. These are attempted leaks or tampering, even if they found nothing. Log any as a QA finding.
+- [ ] **No signs of ambiguity:** extra changes, reformatting, questions about what "change as little as possible" means, or hedging in the submission. If several models do the same thing, check the instructions before blaming the models.
+- [ ] **Claims match actions:** if the submission says the script runs, the transcript shows the agent ran it. This isn't scored, but it matters when judging model behavior.
+
+**What a log can't show:** the final files. The log holds the commands the agent ran, not the sandbox's end state, so the "real fix" check means reconstructing the edit from its commands.
+
 ## Failure review
 
 No run from either model failed, so there's nothing to classify yet. Once a model fails, each failed transcript gets read and labeled as a model error, task ambiguity, or harness issue.
