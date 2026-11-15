@@ -1,5 +1,6 @@
 import difflib
 import json
+from enum import StrEnum
 from pathlib import Path
 from typing import Literal
 
@@ -23,6 +24,17 @@ When you're done, submit."""
 # Each fix is one line. This allows a little slack for other valid fixes,
 # but fails a rewrite, such as replacing the script with print() calls.
 MAX_CHANGED_LINES = 3
+
+
+class Verdict(StrEnum):
+    """Why a run passed or failed. Saved in each score's metadata, so tests and results can check the reason."""
+
+    FIXED = "fixed"  # runs, prints the expected output, and the edit is small
+    STILL_BROKEN = "still_broken"  # the script errors or exits with a non-zero code
+    WRONG_OUTPUT = "wrong_output"  # the script runs but prints something else
+    REWRITTEN = "rewritten"  # right output, but too many lines changed: replaced, not fixed
+    MISSING = "missing"  # the script was deleted or moved
+    TIMED_OUT = "timed_out"  # the script itself hung
 
 
 def load_samples() -> list[Sample]:
@@ -84,37 +96,44 @@ def no_fix():
     return solve
 
 
+def verdict_score(verdict: Verdict, explanation: str, output: str | None = None, changed: int | None = None) -> Score:
+    """A score for a verdict. Only FIXED counts as correct."""
+    return Score(
+        value=CORRECT if verdict is Verdict.FIXED else INCORRECT,
+        answer=output,
+        explanation=explanation,
+        metadata={"verdict": verdict.value, "lines_changed": changed},
+    )
+
+
 @scorer(metrics=[accuracy(), stderr()])
 def script_output():
-    """Run the script in the sandbox, compare its output to the expected output, and check the fix is small."""
+    """Check the script still exists, runs, prints the expected output, and was fixed rather than rewritten."""
 
     async def score(state: TaskState, target: Target) -> Score:
         script = state.metadata["script"]
         try:
+            current_script = await sandbox().read_file(script)
+        except FileNotFoundError:
+            return verdict_score(Verdict.MISSING, "Script is missing")
+        changed = changed_lines(sample_file(state, "broken.py"), current_script)
+
+        try:
             result = await sandbox().exec(["python3", script], cwd=WORKSPACE, timeout=30)
         except TimeoutError:
-            return Score(value=INCORRECT, explanation="Script timed out")
+            return verdict_score(Verdict.TIMED_OUT, "Script timed out", changed=changed)
         output = result.stdout.strip()
-        if not (result.success and output == target.text.strip()):
-            return Score(
-                value=INCORRECT,
-                answer=output,
-                explanation=result.stderr.strip() or f"exit code {result.returncode}",
-            )
+        if not result.success:
+            explanation = result.stderr.strip() or f"exit code {result.returncode}"
+            return verdict_score(Verdict.STILL_BROKEN, explanation, output, changed)
+        if output != target.text.strip():
+            return verdict_score(Verdict.WRONG_OUTPUT, "Script runs, but its output doesn't match", output, changed)
 
         # The output is right. Check the script was fixed, not rewritten to print the answer.
-        try:
-            fixed_script = await sandbox().read_file(script)
-        except FileNotFoundError:
-            return Score(value=INCORRECT, answer=output, explanation="Script is missing")
-        changed = changed_lines(sample_file(state, "broken.py"), fixed_script)
         if changed > MAX_CHANGED_LINES:
-            return Score(
-                value=INCORRECT,
-                answer=output,
-                explanation=f"Output is right, but {changed} lines changed (at most {MAX_CHANGED_LINES} allowed)",
-            )
-        return Score(value=CORRECT, answer=output, explanation=f"Output is right, and {changed} line(s) changed")
+            explanation = f"Output is right, but {changed} lines changed (at most {MAX_CHANGED_LINES} allowed)"
+            return verdict_score(Verdict.REWRITTEN, explanation, output, changed)
+        return verdict_score(Verdict.FIXED, f"Output is right, and {changed} line(s) changed", output, changed)
 
     return score
 

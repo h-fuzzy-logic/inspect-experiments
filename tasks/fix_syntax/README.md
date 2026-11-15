@@ -2,6 +2,8 @@
 
 A very simple bug-fix task. Each sample is a short Python script with one syntax error. The agent has to find and fix the error so the script runs and prints the right output.
 
+**Results and QA:** see [RESULTS.md](RESULTS.md) for model results and figures, and [QA.md](QA.md) for the QA log, tests, and failure review. Some sections are still mock and are labeled as such.
+
 ## Samples
 
 There are 8 samples, each with a different kind of syntax error. They're listed in `samples/samples.json`.
@@ -55,6 +57,10 @@ These errors are easy, so most models will probably score near 1.0. A task that 
 | `.dockerignore` | Host | Hides every file in this folder from the Docker build |
 | `samples/` | Host, except each `broken.py` | The samples, as described above |
 | `tests/test_scorer.py` | Host only | Automated tests for the samples and the scorer |
+| `RESULTS.md` | Host only | Results and figures |
+| `QA.md` | Host only | QA log, tests, failure review, and transcripts |
+| `results/` | Host only | Per-model results from the eval logs, plus mock data files (`mock-*.json`) for charts without real data yet |
+| `figures/` | Host only | The charts in `RESULTS.md`. Files starting with `mock-` are mock |
 
 **Keeping the answers out of the sandbox.** The Docker image contains no scripts. When a sample starts, Inspect copies only that sample's `broken.py` into its sandbox. The fixes and expected outputs never enter the container. As a second guard, `.dockerignore` hides this whole folder from the Docker build, so even a `COPY . /workspace/` line couldn't pull them into the image. The only time a fix reaches the container is with `-T solution=reference`, which writes it there on purpose to test the scorer.
 
@@ -92,7 +98,18 @@ The `script_output()` scorer checks two things after the agent finishes. The res
 1. **The script works.** It runs the sample's script in the sandbox. The script must exit without an error, and its output must match `expected.txt` exactly, apart from surrounding whitespace.
 2. **The script was fixed, not rewritten.** It reads the script back from the sandbox and compares it with `broken.py`. At most 3 lines may change. Each real fix changes 1 line, so this allows a little slack for other valid fixes.
 
-The score's explanation says what happened: the script's error, such as `SyntaxError: expected ':'`, how many lines changed if there were too many, or that the output was right and how many lines changed.
+Each score also records a **verdict**: the reason it passed or failed, from the `Verdict` enum in `fix_syntax.py`. It's saved in the score's metadata as `verdict`, along with `lines_changed`. Only `fixed` counts as correct:
+
+| Verdict | Meaning |
+|---|---|
+| `fixed` | The script runs, prints the expected output, and at most 3 lines changed |
+| `still_broken` | The script errors or exits with a non-zero code |
+| `wrong_output` | The script runs, but prints something else |
+| `rewritten` | The output is right, but too many lines changed: the script was replaced, not fixed |
+| `missing` | The script was deleted or moved |
+| `timed_out` | The script itself ran for more than 30 seconds |
+
+The score's explanation adds the detail: the script's error, such as `SyntaxError: expected ':'`, or how many lines changed.
 
 ## Tests
 
@@ -115,22 +132,28 @@ The tests take about 35 seconds. The sandbox tests need Docker and are skipped i
 
 | Test | What it checks |
 |---|---|
-| `test_all_reference_fixes_pass` | Every reference fix scores `C` |
-| `test_all_broken_scripts_fail` | Every broken script scores `I`, with an error in the explanation, so it fails for the right reason |
+| `test_all_reference_fixes_pass` | Every reference fix scores `C`, with the verdict `fixed` |
+| `test_all_broken_scripts_fail` | Every broken script scores `I`, with the verdict `still_broken` and an error in the explanation, so it fails for the right reason |
 | `test_agent_user_can_edit_every_script` | The non-root `agent` user can edit each copied script with `sed -i`, so a failed run isn't caused by file permissions |
 
 **Scorer edge cases, on the `missing_colon_if` sample:**
 
-| Test | Script | Expected score |
-|---|---|---|
-| `test_wrong_output_fails` | Runs cleanly, but prints the average to 2 decimal places instead of 1 | `I` |
-| `test_error_exit_fails` | Prints the right output, then exits with an error | `I` |
-| `test_trailing_whitespace_passes` | The reference fix plus a blank line at the end | `C` |
-| `test_other_one_line_fix_passes` | A different valid fix: `if (avg > 80):` | `C` |
-| `test_hardcoded_output_fails` | Replaced with a `print()` of the expected output. The test also checks that the explanation mentions the lines changed | `I` |
+| Test | Script | Expected score | Expected verdict |
+|---|---|---|---|
+| `test_wrong_output_fails` | Runs cleanly, but prints the average to 2 decimal places instead of 1 | `I` | `wrong_output` |
+| `test_error_exit_fails` | Prints the right output, then exits with an error | `I` | `still_broken` |
+| `test_trailing_whitespace_passes` | The reference fix plus a blank line at the end | `C` | `fixed` |
+| `test_other_one_line_fix_passes` | A different valid fix: `if (avg > 80):` | `C` | `fixed` |
+| `test_hardcoded_output_fails` | Replaced with a `print()` of the expected output. The test also checks that more than 3 lines changed | `I` | `rewritten` |
+| `test_deleted_script_fails` | Deleted | `I` | `missing` |
+| `test_separate_if_instead_of_elif_passes` | `else_if` sample: a separate `if` in place of `elif`, which behaves the same for every input | `C` | `fixed` |
+
+Each test checks the verdict as well as the score, so a test can't pass for the wrong reason. For example, a deleted script must fail as `missing`, not as a script error.
 
 ## Shortcuts
 
 **Closed: hardcoding the output.** The first version of the scorer checked only the output, not how the script produced it. An agent could replace the script with a `print()` of the expected text, which it could work out by reading the script, and still score `C`. The scorer now also checks that at most 3 lines changed. The hardcoded version of `report.py` changes 17 lines, so it scores `I`. `test_hardcoded_output_fails` guards against this coming back. While the shortcut was open, that test was marked as an expected failure (`xfail`).
 
 **Still open: changing the logic in one line.** The check limits how much changes, not what. For example, `if True:` instead of `if avg > 80:` changes one line and prints the right output, because that script's data puts the average above 80. It scores `C`, even though it changes the script's logic. More samples don't fully close this: the agent sees each script's data, so it could choose a constant that works for that script. Running each fixed script on a second, hidden input, written into the sandbox only at scoring time, would catch it.
+
+Red-teaming the scorer found three more gaps of the same kind: hardcoding a value such as `avg = 84.7` (QA-009), loosening `==` to `>=` (QA-010), and deleting a broken line that doesn't affect the output (QA-011). Each is tracked by a test marked `xfail` (expected to fail) until the scorer catches it. See [QA.md](QA.md#spec-and-scorer-review).

@@ -41,6 +41,8 @@ def sample_text(sample_id: str, name: str) -> str:
     return (SAMPLES_DIR / sample_id / name).read_text()
 
 
+Verdict = task_module.Verdict
+
 BROKEN = sample_text(FOCUS, "broken.py")
 REFERENCE = sample_text(FOCUS, "fixed.py")
 EXPECTED_OUTPUT = sample_text(FOCUS, "expected.txt")
@@ -83,6 +85,17 @@ def write_script(content: str):
 
 
 @solver
+def delete_script():
+    """Stand in for the agent: delete the sample's script."""
+
+    async def solve(state: TaskState, generate: Generate) -> TaskState:
+        await sandbox().exec(["rm", state.metadata["script"]])
+        return state
+
+    return solve
+
+
+@solver
 def edit_script_in_place():
     """Edit the script with sed -i as the sandbox's default user, the way an agent might."""
 
@@ -95,9 +108,14 @@ def edit_script_in_place():
     return solve
 
 
-def score_for(content: str, log_dir: Path):
-    """Run the FOCUS sample with its script set to `content`, and return its score."""
-    return run_task(log_dir, solver=[write_script(content)], sample_id=FOCUS)[FOCUS]
+def score_for(content: str, log_dir: Path, sample_id: str = FOCUS):
+    """Run one sample with its script set to `content`, and return its score."""
+    return run_task(log_dir, solver=[write_script(content)], sample_id=sample_id)[sample_id]
+
+
+def verdict(score) -> Verdict:
+    """The scorer's reason for a pass or fail, saved in the score's metadata."""
+    return Verdict(score.metadata["verdict"])
 
 
 # --- Sample files (host only)
@@ -130,6 +148,7 @@ def test_all_reference_fixes_pass(tmp_path):
     scores = run_task(tmp_path, task_args={"solution": "reference"})
     assert set(scores) == set(SAMPLE_IDS)
     assert {sid: s.value for sid, s in scores.items()} == {sid: "C" for sid in SAMPLE_IDS}
+    assert {verdict(s) for s in scores.values()} == {Verdict.FIXED}
 
 
 @needs_docker
@@ -137,7 +156,8 @@ def test_all_broken_scripts_fail(tmp_path):
     scores = run_task(tmp_path, task_args={"solution": "none"})
     for sample_id, score in scores.items():
         assert score.value == "I", sample_id
-        # Fails for the right reason: the real broken script ran in the task's own image.
+        # Fails for the right reason: the real broken script ran in the task's own image and errored.
+        assert verdict(score) is Verdict.STILL_BROKEN, sample_id
         assert "Error" in score.explanation, sample_id
 
 
@@ -155,19 +175,25 @@ def test_wrong_output_fails(tmp_path):
     # Runs cleanly, but prints the average to 2 decimal places instead of 1.
     near_miss = REFERENCE.replace("{avg:.1f}", "{avg:.2f}")
     assert near_miss != REFERENCE
-    assert score_for(near_miss, tmp_path).value == "I"
+    score = score_for(near_miss, tmp_path)
+    assert score.value == "I"
+    assert verdict(score) is Verdict.WRONG_OUTPUT
 
 
 @needs_docker
 def test_error_exit_fails(tmp_path):
     # Prints exactly the right output, then exits with an error.
-    assert score_for(REFERENCE + "raise SystemExit(1)\n", tmp_path).value == "I"
+    score = score_for(REFERENCE + "raise SystemExit(1)\n", tmp_path)
+    assert score.value == "I"
+    assert verdict(score) is Verdict.STILL_BROKEN
 
 
 @needs_docker
 def test_trailing_whitespace_passes(tmp_path):
     # The scorer strips surrounding whitespace, so an extra blank line is fine.
-    assert score_for(REFERENCE + 'print("")\n', tmp_path).value == "C"
+    score = score_for(REFERENCE + 'print("")\n', tmp_path)
+    assert score.value == "C"
+    assert verdict(score) is Verdict.FIXED
 
 
 @needs_docker
@@ -175,7 +201,9 @@ def test_other_one_line_fix_passes(tmp_path):
     # A different valid fix: parentheses around the condition, plus the colon.
     other_fix = BROKEN.replace("if avg > 80\n", "if (avg > 80):\n")
     assert other_fix != BROKEN
-    assert score_for(other_fix, tmp_path).value == "C"
+    score = score_for(other_fix, tmp_path)
+    assert score.value == "C"
+    assert verdict(score) is Verdict.FIXED
 
 
 @needs_docker
@@ -185,4 +213,55 @@ def test_hardcoded_output_fails(tmp_path):
     shortcut = f"print({EXPECTED_OUTPUT.strip()!r})\n"
     score = score_for(shortcut, tmp_path)
     assert score.value == "I"
-    assert "lines changed" in score.explanation
+    assert verdict(score) is Verdict.REWRITTEN
+    assert score.metadata["lines_changed"] > task_module.MAX_CHANGED_LINES
+
+
+@needs_docker
+def test_deleted_script_fails(tmp_path):
+    # Deleting the script can't count as a fix, and is reported as missing, not as a script error.
+    score = run_task(tmp_path, solver=[delete_script()], sample_id=FOCUS)[FOCUS]
+    assert score.value == "I"
+    assert verdict(score) is Verdict.MISSING
+
+
+@needs_docker
+def test_separate_if_instead_of_elif_passes(tmp_path):
+    # A valid alternative fix: each branch returns, so a separate if behaves the same as elif for every input.
+    # Stricter checks for the gaps below must keep accepting it.
+    alternative = sample_text("else_if", "broken.py").replace("    else if score >= 80:", "    if score >= 80:")
+    score = score_for(alternative, tmp_path, "else_if")
+    assert score.value == "C"
+    assert verdict(score) is Verdict.FIXED
+
+
+# --- Known gaps. Each wrong fix below passes today, because it prints the right output for this sample's data.
+# --- strict=True makes the test fail loudly once the scorer catches it, so the marker gets removed.
+
+
+@needs_docker
+@pytest.mark.xfail(strict=True, reason="QA-004: a one-line logic change prints the right output for this data")
+def test_if_true_fails(tmp_path):
+    wrong = BROKEN.replace("if avg > 80\n", "if True:\n")
+    assert score_for(wrong, tmp_path).value == "I"
+
+
+@needs_docker
+@pytest.mark.xfail(strict=True, reason="QA-009: a hardcoded value prints the right output for this data")
+def test_hardcoded_average_fails(tmp_path):
+    wrong = BROKEN.replace("avg = average(list(scores.values()))", "avg = 84.7").replace("if avg > 80\n", "if avg > 80:\n")
+    assert score_for(wrong, tmp_path).value == "I"
+
+
+@needs_docker
+@pytest.mark.xfail(strict=True, reason="QA-010: a looser comparison prints the right output for this data")
+def test_looser_comparison_fails(tmp_path):
+    wrong = sample_text("assign_in_condition", "broken.py").replace("len(present) = expected", "len(present) >= expected")
+    assert score_for(wrong, tmp_path, "assign_in_condition").value == "I"
+
+
+@needs_docker
+@pytest.mark.xfail(strict=True, reason="QA-011: deleting the broken line passes when the line doesn't affect the output")
+def test_deleted_broken_line_fails(tmp_path):
+    wrong = sample_text("missing_comma", "broken.py").replace('    "tea": 2.75\n', "")
+    assert score_for(wrong, tmp_path, "missing_comma").value == "I"
